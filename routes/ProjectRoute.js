@@ -1,7 +1,9 @@
 const express = require("express");
-const { getProjects } = require("../services/projectsService");
+const { getProjects, createProjects } = require("../services/projectsService");
 const router = express.Router();
 
-router.get("/", getProjects);
+// router.get("/", getProjects);
+// router.post("/", createProjects);
+router.route("/").get(getProjects).post(createProjects);
 
 module.exports = router;
