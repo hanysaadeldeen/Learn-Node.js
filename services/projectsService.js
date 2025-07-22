@@ -1,14 +1,14 @@
 const ProductsModel = require("../models/projectModels");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
-
+const mongoose = require("mongoose");
 // @desc Get all projects
 // @route GET /api/v1/projects/
 // @access Public
 
 exports.getProjects = asyncHandler(async (req, res) => {
   const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 2;
+  const limit = req.query.limit * 1 || 10;
 
   const skip = (page - 1) * limit;
 
@@ -16,6 +16,24 @@ exports.getProjects = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json({ results: projects.length, data: projects, page, limit });
+});
+
+// @desc get Specific Project
+// @route Get /api/v1/projects/:id
+// @access Public
+
+exports.getSpecificProject = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ msg: `Invalid ID format: ${id}` });
+  }
+  const project = await ProductsModel.findById(id);
+
+  if (!project) {
+    res.status(404).json({ msg: `"There is no Project With This ID"${id}` });
+  }
+  res.status(200).json({ data: project });
 });
 
 // @description create Projects
