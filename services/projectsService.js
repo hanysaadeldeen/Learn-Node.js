@@ -35,7 +35,6 @@ exports.getSpecificProject = asyncHandler(async (req, res) => {
   }
   res.status(200).json({ data: project });
 });
-
 // @description create Projects
 // @route       POST /api/v1/projects/
 // @sccess      Private
@@ -46,18 +45,6 @@ exports.createProjects = asyncHandler(async (req, res) => {
   const author = req.body.author;
   const images = req.body.images;
 
-  // ProductsModel.create({
-  //   title,
-  //   author,
-  //   images,
-  //   slug: slugify(title),
-  // })
-  //   .then((projects) => res.status(200).json({ data: projects }))
-  //   .catch((error) => res.status(400).send(error));
-
-  // use  express-async-handler
-  // for Simple middleware for handling exceptions inside of async express routes and passing them to your express error handlers.
-
   const projects = await ProductsModel.create({
     title,
     author,
@@ -65,4 +52,51 @@ exports.createProjects = asyncHandler(async (req, res) => {
     slug: slugify(title),
   });
   res.status(201).json({ data: projects });
+});
+
+// @description update Projects
+// @route    PUT /api/vi/projects/:id
+// @access  Private
+
+exports.updateProjects = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const title = req.body.title;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ msg: `Invalid ID format: ${id}` });
+  }
+
+  const getProject = await ProductsModel.findById(id);
+  if (!getProject) {
+    res.status(300).json({ data: "we can't find this project" });
+  }
+
+  const UpdatedProject = await ProductsModel.findByIdAndUpdate(
+    id,
+    { title },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json({ data: UpdatedProject, previewProjects: getProject });
+});
+
+// @description delete Projects
+// @route    PUT /api/vi/projects/:id
+// @access  Private
+
+exports.deleteProjects = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ msg: `Invalid ID format: ${id}` });
+  }
+  const deletedProject = await ProductsModel.findByIdAndDelete(id);
+
+  if (!deletedProject) {
+    res.status(404).json({ msg: `There is no Project With This ID:${id}` });
+  }
+  res
+    .status(200)
+    .json({ data: { id: deletedProject.id, title: deletedProject.title } });
 });
