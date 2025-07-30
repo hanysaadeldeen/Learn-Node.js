@@ -32,6 +32,7 @@ const ProductsSchema = new mongoose.Schema(
 );
 
 // create model after schema
+// const ProductsModel = mongoose.model("projects", ProductsSchema);
 const ProductsModel = mongoose.model("projects", ProductsSchema);
 
 module.exports = ProductsModel;

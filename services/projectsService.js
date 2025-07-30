@@ -2,6 +2,7 @@ const ProductsModel = require("../models/projectModels");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const mongoose = require("mongoose");
+const AppError = require("../utils/AppError");
 // @desc Get all projects
 // @route GET /api/v1/projects/
 // @access Public
@@ -13,6 +14,7 @@ exports.getProjects = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
 
   const projects = await ProductsModel.find({}).skip(skip).limit(limit);
+
   res
     .status(200)
     .json({ results: projects.length, data: projects, page, limit });
@@ -25,13 +27,14 @@ exports.getProjects = asyncHandler(async (req, res) => {
 exports.getSpecificProject = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ msg: `Invalid ID format: ${id}` });
-  }
+  // if (!mongoose.Types.ObjectId.isValid(id)) {
+  //   return res.status(400).json({ msg: `Invalid ID format: ${id}` });
+  // }
   const project = await ProductsModel.findById(id);
 
   if (!project) {
-    res.status(404).json({ msg: `"There is no Project With This ID"${id}` });
+    // res.status(404).json({ msg: `"There is no Project With This ID"${id}` });
+    return next(new AppError(`"There is no Project With This ID"${id}`, 404));
   }
   res.status(200).json({ data: project });
 });
@@ -60,7 +63,7 @@ exports.createProjects = asyncHandler(async (req, res) => {
 
 exports.updateProjects = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const title = req.body.title;
+  const { title } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ msg: `Invalid ID format: ${id}` });
@@ -68,25 +71,27 @@ exports.updateProjects = asyncHandler(async (req, res) => {
 
   const getProject = await ProductsModel.findById(id);
   if (!getProject) {
-    res.status(300).json({ data: "we can't find this project" });
+    return next(new AppError("we can't find this project", 300));
   }
 
   const UpdatedProject = await ProductsModel.findByIdAndUpdate(
-    id,
+    { _id: id },
     { title },
     {
       new: true,
     }
   );
 
-  res.status(200).json({ data: UpdatedProject, previewProjects: getProject });
+  res
+    .status(200)
+    .json({ data: UpdatedProject.title, previewProjects: getProject.title });
 });
 
 // @description delete Projects
 // @route    PUT /api/vi/projects/:id
 // @access  Private
 
-exports.deleteProjects = asyncHandler(async (req, res) => {
+exports.deleteProjects = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ msg: `Invalid ID format: ${id}` });
@@ -94,9 +99,9 @@ exports.deleteProjects = asyncHandler(async (req, res) => {
   const deletedProject = await ProductsModel.findByIdAndDelete(id);
 
   if (!deletedProject) {
-    res.status(404).json({ msg: `There is no Project With This ID:${id}` });
+    return next(new AppError(`There is no Project With This ID:${id}`, 404));
   }
   res
-    .status(200)
+    .status(204)
     .json({ data: { id: deletedProject.id, title: deletedProject.title } });
 });
