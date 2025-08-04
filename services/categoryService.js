@@ -34,7 +34,7 @@ exports.getSpecificCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ message: "Invalid category id" });
+    return res.status(404).json({ message: "Invalid category idTTT" });
   }
 
   const category = await CategoryModel.findById(id);
