@@ -5,26 +5,26 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../services/categoryService");
+
+const {
+  GetCategoryValidator,
+  UpdateCategoryValidator,
+  DeleteCategoryValidator,
+  CreateCategoryValidator,
+} = require("../utils/Validator/categoryValidator");
 const express = require("express");
 
 const router = express.Router();
-const { param, query, validationResult } = require("express-validator");
 
-router.route("/").get(getCategories).post(createCategory);
+router
+  .route("/")
+  .get(getCategories)
+  .post(CreateCategoryValidator, createCategory);
 router
   .route("/:id")
-  .get(
-    param("id").isMongoId().withMessage("this is not supported category ID"),
-    (req, res) => {
-      const error = validationResult(req);
-      if (!error.isEmpty()) {
-        return res.status(400).json({ error: error.array() });
-      }
-    },
-    getSpecificCategory
-  )
-  .put(updateCategory)
-  .delete(deleteCategory);
+  .get(GetCategoryValidator, getSpecificCategory)
+  .put(UpdateCategoryValidator, updateCategory)
+  .delete(DeleteCategoryValidator, deleteCategory);
 module.exports = router;
 
-// start tomorrow from 45
+// start tomorrow from 47

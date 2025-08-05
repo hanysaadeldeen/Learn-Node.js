@@ -54,14 +54,10 @@ exports.updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ message: "Invalid category id" });
-  }
-
   const oldcategory = await CategoryModel.findById(id);
-  if (!oldcategory) {
-    res.status(404).json({ msg: `"There is no category With This ID"${id}` });
-  }
+  // if (!oldcategory) {
+  //   res.status(404).json({ msg: `"There is no category With This ID"${id}` });
+  // }
   const category = await CategoryModel.findByIdAndUpdate(
     id,
     {

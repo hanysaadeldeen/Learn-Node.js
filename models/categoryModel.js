@@ -4,8 +4,10 @@ const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      unique: [true, "Proejcts Title unique"],
+      unique: [true, "category Title unique"],
       require: [true, "category name is required"],
+      minLength: [3, "category min Length is 3"],
+      maxLength: [10, "category max length is 10"],
     },
     slug: {
       type: String,
