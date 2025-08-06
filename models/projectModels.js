@@ -9,7 +9,7 @@ const ProductsSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      require: [true, "Proejcts Title Required"],
+      required: [true, "Proejcts Title Required"],
       unique: [true, "Proejcts Title unique"],
       minLength: [3, "too short title"],
       maxLength: [20, "too large title"],
@@ -21,11 +21,11 @@ const ProductsSchema = new mongoose.Schema(
     },
     images: {
       type: String,
-      require: false,
+      required: false,
     },
     author: {
       type: String,
-      require: [true, "author Required"],
+      required: [true, "author Required"],
     },
   },
   { timestamps: true }
