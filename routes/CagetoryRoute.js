@@ -1,3 +1,5 @@
+const express = require("express");
+
 const {
   createCategory,
   getCategories,
@@ -12,7 +14,6 @@ const {
   DeleteCategoryValidator,
   CreateCategoryValidator,
 } = require("../utils/Validator/categoryValidator");
-const express = require("express");
 
 const router = express.Router();
 
@@ -26,5 +27,3 @@ router
   .put(UpdateCategoryValidator, updateCategory)
   .delete(DeleteCategoryValidator, deleteCategory);
 module.exports = router;
-
-// start tomorrow from 47

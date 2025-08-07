@@ -2,14 +2,11 @@ const { check, param } = require("express-validator");
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare"); // أتأكد أنك مأمنه صح
 
 exports.createSubCategoryValidator = [
-  // ✅ التحقق من categoryId من الـ URL params
-  param("categoryId")
+  check("category")
     .notEmpty()
     .withMessage("Category ID is required")
     .isMongoId()
-    .withMessage("Invalid Category ID"),
-
-  // ✅ التحقق من title من الـ body
+    .withMessage("this is not supported category ID"),
   check("title")
     .notEmpty()
     .withMessage("SubCategory title is required")
@@ -18,7 +15,6 @@ exports.createSubCategoryValidator = [
     .isLength({ max: 20 })
     .withMessage("Too large subCategory title"),
 
-  // ✅ التحقق من type من الـ body
   check("type")
     .notEmpty()
     .withMessage("SubCategory type is required")
@@ -27,21 +23,28 @@ exports.createSubCategoryValidator = [
     .isLength({ max: 20 })
     .withMessage("Too large subCategory type"),
 
-  // ✅ الميدل وير اللي بيطبع الأخطاء
+  validatorMiddleWare,
+];
+exports.getSubCategoriesValidator = [
+  param("categoryId")
+    .notEmpty()
+    .withMessage("Category ID is required")
+    .isMongoId()
+    .withMessage("this is not supported category ID"),
   validatorMiddleWare,
 ];
 const SubCategoryModel = require("../../models/subCategoryModel");
 
 exports.checkUniqueSubCategory = async (req, res, next) => {
-  const { title, type } = req.body;
+  const { type } = req.body;
 
   const existing = await SubCategoryModel.findOne({
-    $or: [{ title }, { type }],
+    $or: [{ type }],
   });
 
   if (existing) {
     return res.status(400).json({
-      error: "SubCategory title or type must be unique",
+      error: "SubCategory  type must be unique",
     });
   }
 

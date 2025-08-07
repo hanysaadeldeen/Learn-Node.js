@@ -1,8 +1,8 @@
-const ProductsModel = require("../models/projectModels");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const mongoose = require("mongoose");
 const AppError = require("../utils/AppError");
+const ProductsModel = require("../models/projectModels");
 // @desc Get all projects
 // @route GET /api/v1/projects/
 // @access Public
@@ -33,8 +33,9 @@ exports.getSpecificProject = asyncHandler(async (req, res) => {
   const project = await ProductsModel.findById(id);
 
   if (!project) {
-    // res.status(404).json({ msg: `"There is no Project With This ID"${id}` });
-    return next(new AppError(`"There is no Project With This ID"${id}`, 404));
+    return res
+      .status(404)
+      .json({ msg: `"There is no Project With This ID"${id}` });
   }
   res.status(200).json({ data: project });
 });
@@ -44,9 +45,9 @@ exports.getSpecificProject = asyncHandler(async (req, res) => {
 
 // update fetch data to use async await
 exports.createProjects = asyncHandler(async (req, res) => {
-  const title = req.body.title;
-  const author = req.body.author;
-  const images = req.body.images;
+  const { title } = req.body;
+  const { author } = req.body;
+  const { images } = req.body;
 
   const projects = await ProductsModel.create({
     title,
@@ -71,7 +72,7 @@ exports.updateProjects = asyncHandler(async (req, res) => {
 
   const getProject = await ProductsModel.findById(id);
   if (!getProject) {
-    return next(new AppError("we can't find this project", 300));
+    return res.status(404).json({ msg: "this Project does not exist" });
   }
 
   const UpdatedProject = await ProductsModel.findByIdAndUpdate(

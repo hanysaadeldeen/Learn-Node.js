@@ -1,8 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
-const CategoryModel = require("../models/categoryModel");
 const mongoose = require("mongoose");
-const { json } = require("express");
+const CategoryModel = require("../models/categoryModel");
 // @create category
 // @route  post /api/categories
 // @access private

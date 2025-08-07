@@ -1,10 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
-
+const { query, validationResult } = require("express-validator");
 const projectRoute = require("./routes/ProjectRoute");
 const categoryRoute = require("./routes/CagetoryRoute");
 const SubCategoryRoute = require("./routes/SubCategoryRoute");
-const AppError = require("./utils/AppError");
 const { globalError } = require("./middlewares/errorMiddleWare");
 
 const app = express();
@@ -18,8 +17,8 @@ if (process.env.NODE_ENV === "development") {
 // routes
 app.use("/api/v1/projects", projectRoute);
 app.use("/api/v1/categories", categoryRoute);
-app.use("/api/v1/subcategory", SubCategoryRoute);
-const { param, query, validationResult } = require("express-validator");
+app.use("/api/v1/subcategories", SubCategoryRoute);
+
 // app.get("/hello", query("person").notEmpty(), (req, res) => {
 //   res.send(`Hello, ${req.query.person}!`);
 // });
