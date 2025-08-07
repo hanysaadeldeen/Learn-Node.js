@@ -15,6 +15,8 @@
     "class-methods-use-this": "off",
     "no-undef": "warn",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|val" }]
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|val" }],
+    "ecmaVersion": 2022,
+    "sourceType": "module"
   }
 }
