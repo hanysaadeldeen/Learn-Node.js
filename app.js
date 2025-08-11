@@ -4,6 +4,7 @@ const { query, validationResult } = require("express-validator");
 const projectRoute = require("./routes/ProjectRoute");
 const categoryRoute = require("./routes/CagetoryRoute");
 const SubCategoryRoute = require("./routes/SubCategoryRoute");
+const productRoute = require("./routes/ProductRoute");
 const BrandRoute = require("./routes/BrandRoute");
 const { globalError } = require("./middlewares/errorMiddleWare");
 
@@ -20,6 +21,7 @@ app.use("/api/v1/projects", projectRoute);
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", SubCategoryRoute);
 app.use("/api/v1/brand", BrandRoute);
+app.use("/api/v1/product", productRoute);
 
 // app.get("/hello", query("person").notEmpty(), (req, res) => {
 //   res.send(`Hello, ${req.query.person}!`);
