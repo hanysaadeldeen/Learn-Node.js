@@ -32,4 +32,6 @@ process.on("unhandledRejection", (err) => {
   });
 });
 
+// خلص بنفس الطريقه بتاعت ال Category to brand
+
 // start tomorrow from 57

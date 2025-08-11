@@ -2,16 +2,13 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const subCategoryModel = require("../models/subCategoryModel");
 
-
-
 exports.setCategoryIdtoBody = (req, res, next) => {
- if(req.params.categoryId) req.body.category=req.params.categoryId
-  next()
-}
+  if (req.params.categoryId) req.body.category = req.params.categoryId;
+  next();
+};
 
 exports.createSubCategory = asyncHandler(async (req, res) => {
-
- if(req.params.categoryId) req.body.category=req.params.categoryId
+  if (req.params.categoryId) req.body.category = req.params.categoryId;
 
   const { title, type, category } = req.body;
 
@@ -43,18 +40,15 @@ exports.getAllSubCategories = asyncHandler(async (req, res) => {
   const limit = req.query.limit * 1 || 10;
   const skip = (page - 1) * limit;
 
+  let filterForCategory = {};
+  if (req.params.categoryId)
+    filterForCategory = { category: req.params.categoryId };
 
-
-  let filterForCategory={}
-  if (req.params.categoryId) filterForCategory={category:req.params.categoryId}
- 
-    const  subCategories= await subCategoryModel
+  const subCategories = await subCategoryModel
     .find(filterForCategory)
     .skip(skip)
-    .limit(limit)
-  
+    .limit(limit);
 
-  
   res.status(200).json({
     length: subCategories.length,
     subCategory: subCategories,
