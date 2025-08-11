@@ -46,5 +46,6 @@ exports.updateBrand = asyncHandler(async (req, res) => {
 exports.deleteBrand = asyncHandler(async (req, res) => {
   const { brandId } = req.params;
   const brandResponse = await BrandSchema.findByIdAndDelete(brandId);
-  res.status(200).json({ status: "success", data: brandResponse });
+  res.status(200).json({ status: "success",    message: "brand deleted successfully",
+ });
 });
