@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const brandSchema = mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
-      unique: [true, "Brand Title is should be unique"],
-      required: [true, "Brand name is Required"],
-      minlenght: [3, "Brand name must be at least 3 characters"],
-      maxlenght: [20, "Brand name must not be more than 20 characters"],
+      // unique: [true, "Brand Title is should be unique"],
+      required: [true, "Brand title is Required"],
+      minlenght: [3, "Brand title must be at least 3 characters"],
+      maxlenght: [20, "Brand title must not be more than 20 characters"],
       trim: true,
     },
     slug: {
@@ -15,7 +15,7 @@ const brandSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Brand image is Required"],
+      required: false,
     },
   },
   {

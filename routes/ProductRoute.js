@@ -1,12 +1,14 @@
-
-
 const express = require("express");
 
-const {createProduct}=require("../services/projectsService")
+const {
+  createProductValidator,
+} = require("../utils/Validator/productValidator");
+const { createProduct, getAllProducts } = require("../services/ProductService");
 
-const router = express.Router({mergeParams:true});
+const router = express.Router({ mergeParams: true });
 
-
-router.route("/").post(createProduct)
-
-exports.modules=router
+router
+  .route("/")
+  .post(createProductValidator, createProduct)
+  .get(getAllProducts);
+module.exports = router;
