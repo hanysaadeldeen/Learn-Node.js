@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const BrandSchema = require("../models/brandModel");
 const slugify = require("slugify");
+const AppError = require("../utils/AppError");
 
 exports.CreateBrand = asyncHandler(async (req, res) => {
   const { title, image } = req.body;
@@ -23,9 +24,12 @@ exports.getAllBrands = asyncHandler(async (req, res) => {
     data: brandResponse,
   });
 });
-exports.getSpecificBrand = asyncHandler(async (req, res) => {
+exports.getSpecificBrand = asyncHandler(async (req, res,next) => {
   const { brandId } = req.params;
   const brandResponse = await BrandSchema.findById(brandId);
+  if (!brandResponse) {
+    return next (new AppError("No brand found with this ID", 404));
+  }
   res.status(200).json({ status: "success", data: brandResponse });
 });
 
@@ -46,6 +50,9 @@ exports.updateBrand = asyncHandler(async (req, res) => {
 exports.deleteBrand = asyncHandler(async (req, res) => {
   const { brandId } = req.params;
   const brandResponse = await BrandSchema.findByIdAndDelete(brandId);
-  res.status(200).json({ status: "success",    message: "brand deleted successfully",
+  if (!brandResponse) {
+    return next (new AppError("No brand found with this ID", 404));
+  }
+  res.status(200).json({ status: "success", message: "brand deleted successfully",
  });
 });

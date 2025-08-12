@@ -33,7 +33,6 @@ const ProductSchema = mongoose.Schema(
     imgCover: {
       type: String,
       required: [false, "image Cover is required"],
-      default: "default-image.jpg",
     },
     images: {
       type: [String],
@@ -63,7 +62,7 @@ const ProductSchema = mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      ref: "category",
       required: [true, "Category is required"],
     },
     subCategory: [{

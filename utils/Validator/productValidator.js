@@ -1,6 +1,9 @@
 const { check,param } = require("express-validator");
 const validationRouter = require("../../middlewares/validatorMiddleWare");
-
+const BrandSchema = require("../../models/brandModel");
+const categoryModel = require("../../models/categoryModel");
+const subCategoryModel = require("../../models/subCategoryModel");
+const AppError = require("../AppError");
 exports.createProductValidator = [
 // Title
   check("title")
@@ -9,8 +12,8 @@ exports.createProductValidator = [
     .isLength({ max: 30 }).withMessage("Product title must be at most 30 characters"),
 
   // Slug
-  check("slug")
-    .notEmpty().withMessage("Product slug is required"),
+  // check("slug")
+  //   .notEmpty().withMessage("Product slug is required"),
 
   // Price Before
   check("priceBefore")
@@ -72,25 +75,41 @@ exports.createProductValidator = [
   // category
   check("category")
     .notEmpty().withMessage("Category is required")
-    .isMongoId().withMessage("Invalid Category ID format"),
+    .isMongoId().withMessage("Invalid Category ID format").custom(async (categoryId) => {
+      
+      const category = await categoryModel.findById(categoryId);
+      if (!category) {
+        return Promise.reject(new Error(`Category with ID ${categoryId} does not exist`));
+      }
+     }),
 
   // subCategory
   check("subCategory")
     .optional()
     .isArray().withMessage("SubCategory must be an array of IDs")
-    .custom((arr) => {
-      arr.forEach(id => {
-        if (!/^[0-9a-fA-F]{24}$/.test(id)) {
-          throw new Error(`Invalid SubCategory ID format: ${id}`);
-        }
-      });
-      return true;
-    }),
+    .custom(async (subCategoryIds) => {
+ 
+      await Promise.all(subCategoryIds.map(async (id) => { 
+        const subCategoryIdTest = await subCategoryModel.findById(id);
+      if (!subCategoryIdTest) {
+        throw new AppError(`subCategory with ID ${id} does not exist`, 404);
+        // throw new Error(`subCategory with ID ${id} does not exist`);
+      }
+      }))
+      return true
+      
+     }),
 
   // brand
   check("brand")
     .optional()
-    .isMongoId().withMessage("Invalid Brand ID format"),
+    .isMongoId().withMessage("Invalid Brand ID format").custom((brandId) => { 
+      return BrandSchema.findById(brandId).then((brand) => {
+        if (!brand) {
+          return Promise.reject(new Error(`Brand with ID ${brandId} does not exist`));
+        }
+      });
+    }),
 
   validationRouter,
 ];
