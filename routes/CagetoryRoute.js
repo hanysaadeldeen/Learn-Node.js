@@ -15,12 +15,12 @@ const {
   CreateCategoryValidator,
 } = require("../utils/Validator/categoryValidator");
 
-const SubCategoriesRoute=require("./SubCategoryRoute")
+const SubCategoriesRoute = require("./SubCategoryRoute");
 
 const router = express.Router();
 
 // nested Route for category
-router.use("/:categoryId/subcategories",SubCategoriesRoute)
+router.use("/:categoryId/subcategories", SubCategoriesRoute);
 
 router
   .route("/")
