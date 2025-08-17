@@ -14,21 +14,20 @@ exports.createProduct = asynchandler(async (req, res) => {
 
 exports.getAllProducts = asynchandler(async (req, res) => {
   // Filtering
-  const filter = { ...req.query };
+  const queryObj = { ...req.query };
   const excludedFields = ["page", "sort", "limit", "fields"];
-  excludedFields.forEach((el) => delete filter[el]);
-
-  // let queryStr = JSON.stringify(filter);
-  // queryStr = queryStr.replace(
-  //   /\b(gt|gte|lt|lte|in)\b/g,
-  //   (match) => `$${match}`
-  // );
-  // let query = ProductModel.find(JSON.parse(queryStr));
+  excludedFields.forEach((el) => delete queryObj[el]);
 
   // Pagination
   const page = req.query.page * 1 || 1;
   const limit = req.query.limit * 1 || 20;
   const skip = (page - 1) * limit;
+
+  // applying filter using gte, gt, lte, lt
+  let queryStr = JSON.stringify(queryObj);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  const filter = JSON.parse(queryStr);
+  console.log("filter", filter);
 
   const productResponse = await ProductModel.find(filter)
     .skip(skip)

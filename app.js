@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const qs = require("qs");
 const { query, validationResult } = require("express-validator");
 const categoryRoute = require("./routes/CagetoryRoute");
 const SubCategoryRoute = require("./routes/SubCategoryRoute");
@@ -10,7 +11,7 @@ const { globalError } = require("./middlewares/errorMiddleWare");
 const app = express();
 // middleWares
 app.use(express.json());
-
+app.set("query parser", (str) => qs.parse(str));
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
