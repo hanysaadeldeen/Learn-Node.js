@@ -22,6 +22,8 @@ exports.getAllProducts = asynchandler(async (req, res) => {
     status: "success",
     length: productResponse.length,
     data: productResponse,
+    page,
+    limit,
   });
 });
 exports.getProduct = asynchandler(async (req, res,next) => {
