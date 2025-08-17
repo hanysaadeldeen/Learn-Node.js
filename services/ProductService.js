@@ -13,11 +13,27 @@ exports.createProduct = asynchandler(async (req, res) => {
 });
 
 exports.getAllProducts = asynchandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 10;
+  // Filtering
+  const filter = { ...req.query };
+  const excludedFields = ["page", "sort", "limit", "fields"];
+  excludedFields.forEach((el) => delete filter[el]);
 
+  // let queryStr = JSON.stringify(filter);
+  // queryStr = queryStr.replace(
+  //   /\b(gt|gte|lt|lte|in)\b/g,
+  //   (match) => `$${match}`
+  // );
+  // let query = ProductModel.find(JSON.parse(queryStr));
+
+  // Pagination
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 20;
   const skip = (page - 1) * limit;
-  const productResponse = await ProductModel.find({}).skip(skip).limit(limit);
+
+  const productResponse = await ProductModel.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .populate({ path: "category", select: "name" });
   res.status(200).json({
     status: "success",
     length: productResponse.length,
