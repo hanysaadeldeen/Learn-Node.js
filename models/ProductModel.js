@@ -8,7 +8,7 @@ const ProductSchema = mongoose.Schema(
       required: [true, "Product title is required"],
       trim: true,
       minLength: [3, "Product title must be at least 3 characters"],
-      maxLength: [30, "Product title must be at most 30 characters"],
+      maxLength: [100, "Product title must be at most 30 characters"],
     },
     slug: {
       type: String,
@@ -44,11 +44,11 @@ const ProductSchema = mongoose.Schema(
     },
     quantity: {
       type: Number,
-      required: [true,"product quantity is required"],
+      required: [true, "product quantity is required"],
     },
     sold: {
-      type:Number,
-      default:0
+      type: Number,
+      default: 0,
     },
     ratingAverage: {
       type: Number,
@@ -65,10 +65,12 @@ const ProductSchema = mongoose.Schema(
       ref: "category",
       required: [true, "Category is required"],
     },
-    subCategory: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "subCategory",
-    }],
+    subCategory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "subCategory",
+      },
+    ],
     brand: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",

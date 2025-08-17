@@ -32,5 +32,5 @@ process.on("unhandledRejection", (err) => {
   });
 });
 
-// start tomorrow from 67 youtube 69 udemy
-// Validate That Subcategories Belong to Category
+// start tomorrow from 68 youtube 70 udemy
+// Insert & Delete Products Dummy Data Using Seeder Script
