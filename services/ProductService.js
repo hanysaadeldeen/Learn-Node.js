@@ -28,7 +28,19 @@ exports.getAllProducts = asynchandler(async (req, res) => {
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   const filter = JSON.parse(queryStr);
 
-  const mongooseQuery = ProductModel.find(filter)
+  let searchQuery = {};
+  if (req.query.keyword) {
+    const keyword = req.query.keyword;
+    searchQuery = {
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    };
+  }
+  const finalQuery = { ...filter, ...searchQuery };
+
+  const mongooseQuery = ProductModel.find(finalQuery)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
@@ -48,6 +60,7 @@ exports.getAllProducts = asynchandler(async (req, res) => {
   } else {
     mongooseQuery.select("-__v");
   }
+
   const productResponse = await mongooseQuery;
 
   // response
