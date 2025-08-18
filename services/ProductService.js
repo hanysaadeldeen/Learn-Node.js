@@ -27,12 +27,30 @@ exports.getAllProducts = asynchandler(async (req, res) => {
   let queryStr = JSON.stringify(queryObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   const filter = JSON.parse(queryStr);
-  console.log("filter", filter);
 
-  const productResponse = await ProductModel.find(filter)
+  const mongooseQuery = ProductModel.find(filter)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
+
+  // Sorting
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    mongooseQuery.sort(sortBy);
+  } else {
+    mongooseQuery.sort("-createdAt");
+  }
+
+  //  field selection
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    mongooseQuery.select(fields);
+  } else {
+    mongooseQuery.select("-__v");
+  }
+  const productResponse = await mongooseQuery;
+
+  // response
   res.status(200).json({
     status: "success",
     length: productResponse.length,
