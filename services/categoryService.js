@@ -72,6 +72,7 @@ exports.updateCategory = asyncHandler(async (req, res) => {
 exports.deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
+  // test
   const category = await CategoryModel.findByIdAndDelete(id);
   if (!category) {
     return res.status(404).json({ message: "Category not found" });
