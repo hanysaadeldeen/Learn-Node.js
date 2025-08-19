@@ -15,7 +15,7 @@ exports.createProduct = asynchandler(async (req, res) => {
 exports.getAllProducts = asynchandler(async (req, res) => {
   // Filtering
   const queryObj = { ...req.query };
-  const excludedFields = ["page", "sort", "limit", "fields"];
+  const excludedFields = ["page", "sort", "limit", "fields", "keyword"];
   excludedFields.forEach((el) => delete queryObj[el]);
 
   // Pagination
@@ -28,19 +28,7 @@ exports.getAllProducts = asynchandler(async (req, res) => {
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   const filter = JSON.parse(queryStr);
 
-  let searchQuery = {};
-  if (req.query.keyword) {
-    const keyword = req.query.keyword;
-    searchQuery = {
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
-  }
-  const finalQuery = { ...filter, ...searchQuery };
-
-  const mongooseQuery = ProductModel.find(finalQuery)
+  const mongooseQuery = ProductModel.find(filter)
     .skip(skip)
     .limit(limit)
     .populate({ path: "category", select: "name" });
@@ -59,6 +47,19 @@ exports.getAllProducts = asynchandler(async (req, res) => {
     mongooseQuery.select(fields);
   } else {
     mongooseQuery.select("-__v");
+  }
+
+  // Search functionality
+  let searchQuery = {};
+  if (req.query.keyword) {
+    const keyword = req.query.keyword;
+    searchQuery = {
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    };
+    mongooseQuery.find(searchQuery);
   }
 
   const productResponse = await mongooseQuery;
