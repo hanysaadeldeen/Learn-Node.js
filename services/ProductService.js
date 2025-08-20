@@ -15,68 +15,24 @@ exports.createProduct = asynchandler(async (req, res) => {
 });
 
 exports.getAllProducts = asynchandler(async (req, res) => {
-  // ! Filtering
-  // const queryObj = { ...req.query };
-  // const excludedFields = ["page", "sort", "limit", "fields", "keyword"];
-  // excludedFields.forEach((el) => delete queryObj[el]);
-
-  // ! Pagination
-  // const page = req.query.page * 1 || 1;
-  // const limit = req.query.limit * 1 || 20;
-  // const skip = (page - 1) * limit;
-
-  // ! applying filter using gte, gt, lte, lt
-  // let queryStr = JSON.stringify(queryObj);
-  // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  // const filter = JSON.parse(queryStr);
-
-  const mongooseQuery = new ApiFeature(ProductModel.find(), req.query)
+  const apiFeature = new ApiFeature(ProductModel.find(), req.query)
     .search()
     .filter()
-    .buildQuery()
     .sort()
-    .fields();
-
-  const productResponse = await mongooseQuery.query;
-  // .populate({ path: "category", select: "name" });
-  // .filter();
-
-  //
-  // .sort()
-  //
-  // .fields()
-  // .paginate()
-  // ;
-
-  // .skip(skip)
-  // .limit(limit)
-
-  // !  field selection
-  // if (req.query.fields) {
-  //   const fields = req.query.fields.split(",").join(" ");
-  //   mongooseQuery.select(fields);
-  // } else {
-  //   mongooseQuery.select("-__v");
-  // }
-
-  // ! Search functionality
-  // let searchQuery = {};
-  // if (req.query.keyword) {
-  //   const keyword = req.query.keyword;
-  //   searchQuery = {
-  //     $or: [
-  //       { title: { $regex: keyword, $options: "i" } },
-  //       { description: { $regex: keyword, $options: "i" } },
-  //     ],
-  //   };
-  //   mongooseQuery.find(searchQuery);
-  // }
+    .fields()
+    .paginate();
+  const productResponse = await apiFeature.query.populate({
+    path: "category",
+    select: "name slug-_id",
+  });
 
   // response
   res.status(200).json({
     status: "success",
     length: productResponse.length,
     data: productResponse,
+    page: apiFeature.page,
+    limit: apiFeature.limit,
   });
 });
 
