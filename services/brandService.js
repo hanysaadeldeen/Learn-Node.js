@@ -3,6 +3,8 @@ const BrandSchema = require("../models/brandModel");
 const slugify = require("slugify");
 const AppError = require("../utils/AppError");
 
+const ApiFeature = require("../utils/apiFeature");
+
 exports.CreateBrand = asyncHandler(async (req, res) => {
   const { title, image } = req.body;
   const brandResponse = await BrandSchema.create({
@@ -13,22 +15,26 @@ exports.CreateBrand = asyncHandler(async (req, res) => {
 });
 
 exports.getAllBrands = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 10;
+  const countDoc = await BrandSchema.countDocuments();
+  const apifeature = new ApiFeature(BrandSchema.find(), req.query)
+    .search()
+    .paginate(countDoc);
 
-  const skip = (page - 1) * limit;
-  const brandResponse = await BrandSchema.find({}).skip(skip).limit(limit);
+  const { query, paginationResult } = apifeature;
+  const brandResponse = await query;
+
   res.status(200).json({
     status: "success",
     length: brandResponse.length,
+    paginationResult,
     data: brandResponse,
   });
 });
-exports.getSpecificBrand = asyncHandler(async (req, res,next) => {
+exports.getSpecificBrand = asyncHandler(async (req, res, next) => {
   const { brandId } = req.params;
   const brandResponse = await BrandSchema.findById(brandId);
   if (!brandResponse) {
-    return next (new AppError("No brand found with this ID", 404));
+    return next(new AppError("No brand found with this ID", 404));
   }
   res.status(200).json({ status: "success", data: brandResponse });
 });
@@ -51,8 +57,9 @@ exports.deleteBrand = asyncHandler(async (req, res) => {
   const { brandId } = req.params;
   const brandResponse = await BrandSchema.findByIdAndDelete(brandId);
   if (!brandResponse) {
-    return next (new AppError("No brand found with this ID", 404));
+    return next(new AppError("No brand found with this ID", 404));
   }
-  res.status(200).json({ status: "success", message: "brand deleted successfully",
- });
+  res
+    .status(200)
+    .json({ status: "success", message: "brand deleted successfully" });
 });

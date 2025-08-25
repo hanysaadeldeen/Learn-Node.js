@@ -2,8 +2,6 @@ class ApiFeature {
   constructor(query, queryString) {
     this.query = query;
     this.queryString = queryString;
-    this.page = 1; // default
-    this.limit = 20;
   }
 
   filter() {
@@ -61,11 +59,25 @@ class ApiFeature {
   }
 
   // Pagination
-  paginate() {
-    this.page = this.queryString.page * 1 || 1;
-    this.limit = this.queryString.limit * 1 || 20;
-    const skip = (this.page - 1) * this.limit;
-    this.query = this.query.skip(skip).limit(this.limit);
+  paginate(countDocument) {
+    const page = this.queryString.page * 1 || 1;
+    const limit = this.queryString.limit * 1 || 20;
+    const skip = (page - 1) * limit;
+
+    const endIndex = page * limit;
+    const pagination = {};
+    pagination.page = page;
+    pagination.limit = limit;
+    pagination.numberOfPages = Math.ceil(countDocument / limit);
+    if (endIndex < countDocument) {
+      pagination.next = page + 1;
+    }
+    if (skip > 0) {
+      pagination.prev = page - 1;
+    }
+    this.query = this.query.skip(skip).limit(limit);
+
+    this.paginationResult = pagination;
     return this;
   }
 }

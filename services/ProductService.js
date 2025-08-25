@@ -15,13 +15,18 @@ exports.createProduct = asynchandler(async (req, res) => {
 });
 
 exports.getAllProducts = asynchandler(async (req, res) => {
+  const countDoc = await ProductModel.countDocuments();
+
   const apiFeature = new ApiFeature(ProductModel.find(), req.query)
+    .paginate(countDoc)
     .search()
     .filter()
     .sort()
-    .fields()
-    .paginate();
-  const productResponse = await apiFeature.query.populate({
+    .fields();
+
+  const { query, paginationResult } = apiFeature;
+
+  const productResponse = await query.populate({
     path: "category",
     select: "name slug-_id",
   });
@@ -30,9 +35,8 @@ exports.getAllProducts = asynchandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     length: productResponse.length,
+    paginationResult,
     data: productResponse,
-    page: apiFeature.page,
-    limit: apiFeature.limit,
   });
 });
 
