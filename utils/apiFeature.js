@@ -22,20 +22,25 @@ class ApiFeature {
   }
 
   // search with Keyword
-  search() {
+  search(typeSearch) {
     if (this.queryString.keyword) {
       const keyword = this.queryString.keyword;
-      const searchQuery = {
-        $or: [
+      let searchQuery = {};
+
+      if (!typeSearch) {
+        searchQuery.$or = [
           { title: { $regex: keyword, $options: "i" } },
           { description: { $regex: keyword, $options: "i" } },
-        ],
-      };
+        ];
+      } else {
+        searchQuery = {
+          name: { $regex: keyword, $options: "i" },
+        };
+      }
       this.query = this.query.find(searchQuery);
     }
     return this;
   }
-
   // Sorting
   sort() {
     if (this.queryString.sort) {

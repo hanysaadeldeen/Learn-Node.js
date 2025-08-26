@@ -19,10 +19,10 @@ exports.getAllProducts = asynchandler(async (req, res) => {
 
   const apiFeature = new ApiFeature(ProductModel.find(), req.query)
     .paginate(countDoc)
-    .search()
     .filter()
     .sort()
-    .fields();
+    .fields()
+    .search();
 
   const { query, paginationResult } = apiFeature;
 

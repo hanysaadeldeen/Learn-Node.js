@@ -18,6 +18,7 @@ exports.getAllBrands = asyncHandler(async (req, res) => {
   const countDoc = await BrandSchema.countDocuments();
   const apifeature = new ApiFeature(BrandSchema.find(), req.query)
     .search()
+    .sort()
     .paginate(countDoc);
 
   const { query, paginationResult } = apifeature;

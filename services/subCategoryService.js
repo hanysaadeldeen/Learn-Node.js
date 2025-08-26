@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const subCategoryModel = require("../models/subCategoryModel");
+const ApiFeature = require("../utils/apiFeature");
 
 exports.setCategoryIdtoBody = (req, res, next) => {
   if (req.params.categoryId) req.body.category = req.params.categoryId;
@@ -36,24 +37,26 @@ exports.getSpecificSubCategories = asyncHandler(async (req, res) => {
 });
 
 exports.getAllSubCategories = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 10;
-  const skip = (page - 1) * limit;
-
   let filterForCategory = {};
-  if (req.params.categoryId)
+  if (req.params.categoryId) {
     filterForCategory = { category: req.params.categoryId };
+  }
+  const countDoc = await subCategoryModel.countDocuments();
+  const apiFeature = new ApiFeature(
+    subCategoryModel.find(filterForCategory),
+    req.query
+  )
+    .paginate(countDoc)
+    .search()
+    .sort();
 
-  const subCategories = await subCategoryModel
-    .find(filterForCategory)
-    .skip(skip)
-    .limit(limit);
+  const { query, paginationResult } = apiFeature;
+  const subCategories = await query;
 
   res.status(200).json({
     length: subCategories.length,
+    paginationResult,
     subCategory: subCategories,
-    page,
-    limit,
   });
 });
 
