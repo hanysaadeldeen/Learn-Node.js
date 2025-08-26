@@ -4,6 +4,7 @@ const slugify = require("slugify");
 const AppError = require("../utils/AppError");
 
 const ApiFeature = require("../utils/apiFeature");
+const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
 
 exports.CreateBrand = asyncHandler(async (req, res) => {
   const { title, image } = req.body;
@@ -32,35 +33,21 @@ exports.getAllBrands = asyncHandler(async (req, res) => {
   });
 });
 exports.getSpecificBrand = asyncHandler(async (req, res, next) => {
-  const { brandId } = req.params;
-  const brandResponse = await BrandSchema.findById(brandId);
+  const { id } = req.params;
+  const brandResponse = await BrandSchema.findById(id);
   if (!brandResponse) {
     return next(new AppError("No brand found with this ID", 404));
   }
   res.status(200).json({ status: "success", data: brandResponse });
 });
 
-exports.updateBrand = asyncHandler(async (req, res) => {
-  const { brandId } = req.params;
-  const { title, image } = req.body;
-  const brandResponse = await BrandSchema.findByIdAndUpdate(
-    brandId,
-    {
-      title,
-      slug: slugify(title),
-    },
-    { new: true }
-  );
-  res.status(200).json({ status: "success", data: brandResponse });
-});
+// @desc    Update specific brand
+// @route   PUT /api/v1/brand/:id
+// @access  Private
 
-exports.deleteBrand = asyncHandler(async (req, res) => {
-  const { brandId } = req.params;
-  const brandResponse = await BrandSchema.findByIdAndDelete(brandId);
-  if (!brandResponse) {
-    return next(new AppError("No brand found with this ID", 404));
-  }
-  res
-    .status(200)
-    .json({ status: "success", message: "brand deleted successfully" });
-});
+exports.updateBrand = UpdateDoc(BrandSchema);
+
+// @desc    Delete specific brand
+// @route   DELETE /api/v1/brand/:id
+// @access  Private
+exports.deleteBrand = DeleteDoc(BrandSchema);

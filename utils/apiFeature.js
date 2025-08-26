@@ -9,14 +9,12 @@ class ApiFeature {
     const excludedFields = ["page", "sort", "limit", "fields", "keyword"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // 1B) Advanced filtering
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(
       /\b(gt|gte|lt|lte|ne)\b/g,
       (match) => `$${match}`
     );
     const filter = JSON.parse(queryStr);
-    // Object.assign(this.filterObj, filter);
     this.query = this.query.find(filter);
     return this;
   }

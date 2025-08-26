@@ -157,15 +157,13 @@ exports.createProductValidator = [
 ];
 
 exports.updateProductValidator = [
-  param("productId").notEmpty().withMessage("productId Id is required"),
-  check("productId")
-    .isMongoId()
-    .withMessage("productId is not supported productId"),
+  param("id").notEmpty().withMessage("id Id is required"),
+  check("id").isMongoId().withMessage("id is not supported id"),
   validationRouter,
 ];
 
 exports.deleteProductValidator = [
-  param("productId").notEmpty().withMessage("productId Id is required"),
-  check("productId").isMongoId().withMessage("this is not supported productId"),
+  param("id").notEmpty().withMessage("id Id is required"),
+  check("id").isMongoId().withMessage("this is not supported id"),
   validationRouter,
 ];

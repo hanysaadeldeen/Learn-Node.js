@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const subCategoryModel = require("../models/subCategoryModel");
 const ApiFeature = require("../utils/apiFeature");
+const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
 
 exports.setCategoryIdtoBody = (req, res, next) => {
   if (req.params.categoryId) req.body.category = req.params.categoryId;
@@ -60,33 +61,6 @@ exports.getAllSubCategories = asyncHandler(async (req, res) => {
   });
 });
 
-exports.updateSubCategory = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params;
-  const updateData = { ...req.body };
+exports.updateSubCategory = UpdateDoc(subCategoryModel);
 
-  if (updateData.title) {
-    updateData.slug = slugify(updateData.title);
-  }
-  const subCategory = await subCategoryModel.findByIdAndUpdate(
-    categoryId,
-    updateData,
-    { new: true }
-  );
-  res.status(201).json({
-    status: "success",
-    data: subCategory,
-    length: subCategory.length,
-  });
-});
-
-exports.deleteSubCategory = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params;
-  const response = await subCategoryModel.findByIdAndDelete(categoryId);
-  if (!response) {
-    return res
-      .status(404)
-      .json({ status: "failed", message: "not foundSubCategory " });
-  }
-
-  res.status(200).json({ message: "delete subCategory successfully" });
-});
+exports.deleteSubCategory = DeleteDoc(subCategoryModel);

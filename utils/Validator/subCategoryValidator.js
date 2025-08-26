@@ -26,7 +26,7 @@ exports.createSubCategoryValidator = [
   validatorMiddleWare,
 ];
 exports.getSubCategoriesValidator = [
-  param("categoryId")
+  param("id")
     .notEmpty()
     .withMessage("Category ID is required")
     .isMongoId()

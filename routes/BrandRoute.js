@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.route("/").post(createBrandValidator, CreateBrand).get(getAllBrands);
 router
-  .route("/:brandId")
+  .route("/:id")
   .get(getSpecificBrandValidator, getSpecificBrand)
   .put(updateSpecificBrandValidator, updateBrand)
   .delete(deleteSpecificBrandValidator, deleteBrand);

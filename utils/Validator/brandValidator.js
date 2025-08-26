@@ -14,19 +14,19 @@ exports.createBrandValidator = [
 ];
 
 exports.getSpecificBrandValidator = [
-  param("brandId").notEmpty().withMessage("brand Id is required"),
-  check("brandId").isMongoId().withMessage("this is not supported brand Id"),
+  param("id").notEmpty().withMessage("brand Id is required"),
+  check("id").isMongoId().withMessage("this is not supported brand Id"),
   validatorMiddleWare,
 ];
 
 exports.updateSpecificBrandValidator = [
-  param("brandId").notEmpty().withMessage("brand Id is required"),
-  check("brandId").isMongoId().withMessage("this is not supported brand Id"),
+  param("id").notEmpty().withMessage("brand Id is required"),
+  check("id").isMongoId().withMessage("this is not supported brand Id"),
   validatorMiddleWare,
 ];
 
 exports.deleteSpecificBrandValidator = [
-  param("brandId").notEmpty().withMessage("brand Id is required"),
-  check("brandId").isMongoId().withMessage("this is not supported brand Id"),
+  param("id").notEmpty().withMessage("brand Id is required"),
+  check("id").isMongoId().withMessage("this is not supported brand Id"),
   validatorMiddleWare,
 ];

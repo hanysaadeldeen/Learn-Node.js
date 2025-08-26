@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const mongoose = require("mongoose");
 const CategoryModel = require("../models/categoryModel");
 const ApiFeature = require("../utils/apiFeature");
+const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
 // @create category
 // @route  post /api/categories
 // @access private
@@ -53,34 +54,10 @@ exports.getSpecificCategory = asyncHandler(async (req, res) => {
 
 //@update category by id
 //@route get /api/categories/:id
-//@access public
+//@access Private
+exports.updateCategory = UpdateDoc(CategoryModel);
 
-exports.updateCategory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-
-  const oldcategory = await CategoryModel.findById(id);
-  // if (!oldcategory) {
-  //   res.status(404).json({ msg: `"There is no category With This ID"${id}` });
-  // }
-  const category = await CategoryModel.findByIdAndUpdate(
-    id,
-    {
-      name,
-      slug: slugify(name),
-    },
-    { new: true }
-  );
-
-  res.status(201).json({ oldName: oldcategory.name, data: category });
-});
-
-exports.deleteCategory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  const category = await CategoryModel.findByIdAndDelete(id);
-  if (!category) {
-    return res.status(404).json({ message: "Category not found" });
-  }
-  res.status(209).json({ message: "category deleted" });
-});
+// @desc    Delete specific category
+// @route   DELETE /api/v1/categories/:id
+// @access  Private
+exports.deleteCategory = DeleteDoc(CategoryModel);
