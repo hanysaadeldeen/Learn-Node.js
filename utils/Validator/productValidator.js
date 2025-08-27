@@ -1,6 +1,5 @@
 const { check, param } = require("express-validator");
-const validationRouter = require("../../middlewares/validatorMiddleWare");
-const BrandSchema = require("../../models/brandModel");
+const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const categoryModel = require("../../models/categoryModel");
 const subCategoryModel = require("../../models/subCategoryModel");
 const AppError = require("../AppError");
@@ -153,17 +152,23 @@ exports.createProductValidator = [
       });
     }),
 
-  validationRouter,
+  validatorMiddleWare,
+];
+
+exports.getSpecificProductValidator = [
+  param("id").notEmpty().withMessage("product Id is required"),
+  check("id").isMongoId().withMessage("this is not supported product Id"),
+  validatorMiddleWare,
 ];
 
 exports.updateProductValidator = [
   param("id").notEmpty().withMessage("id Id is required"),
   check("id").isMongoId().withMessage("id is not supported id"),
-  validationRouter,
+  validatorMiddleWare,
 ];
 
 exports.deleteProductValidator = [
   param("id").notEmpty().withMessage("id Id is required"),
   check("id").isMongoId().withMessage("this is not supported id"),
-  validationRouter,
+  validatorMiddleWare,
 ];

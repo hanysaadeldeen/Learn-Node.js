@@ -4,6 +4,7 @@ const {
   createProductValidator,
   updateProductValidator,
   deleteProductValidator,
+  getSpecificProductValidator,
 } = require("../utils/Validator/productValidator");
 const {
   createProduct,
@@ -23,7 +24,7 @@ router
 
 router
   .route("/:id")
-  .get(getProduct)
+  .get(getSpecificProductValidator, getProduct)
   .put(updateProductValidator, updateProduct)
   .delete(deleteProductValidator, deleteProduct);
 module.exports = router;

@@ -2,7 +2,7 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const subCategoryModel = require("../models/subCategoryModel");
 const ApiFeature = require("../utils/apiFeature");
-const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
+const { DeleteDoc, UpdateDoc, GetSpecificDoc } = require("./handlersFactory");
 
 exports.setCategoryIdtoBody = (req, res, next) => {
   if (req.params.categoryId) req.body.category = req.params.categoryId;
@@ -26,15 +26,13 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
     data: subCategory,
   });
 });
-exports.getSpecificSubCategories = asyncHandler(async (req, res) => {
-  const { categoryId } = req.params;
 
-  const subCategories = await subCategoryModel
-    .find({ category: categoryId })
-    .populate({ path: "category", select: "name-_id" });
-  res
-    .status(200)
-    .json({ length: subCategories.length, subCategory: subCategories });
+// @desc    Get specific subcategories by id
+// @route   GET /api/v1/subcategories/:id
+// @access  Public
+exports.getSpecificSubCategories = GetSpecificDoc(subCategoryModel, {
+  field: "category",
+  populate: { path: "category", select: "name-_id" },
 });
 
 exports.getAllSubCategories = asyncHandler(async (req, res) => {

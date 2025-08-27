@@ -3,7 +3,7 @@ const slugify = require("slugify");
 const mongoose = require("mongoose");
 const CategoryModel = require("../models/categoryModel");
 const ApiFeature = require("../utils/apiFeature");
-const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
+const { DeleteDoc, UpdateDoc, GetSpecificDoc } = require("./handlersFactory");
 // @create category
 // @route  post /api/categories
 // @access private
@@ -36,25 +36,12 @@ exports.getCategories = asyncHandler(async (req, res) => {
 //@route get /api/categories/:id
 //@access public
 
-exports.getSpecificCategory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ message: "Invalid category idTTT" });
-  }
-
-  const category = await CategoryModel.findById(id);
-
-  if (!category) {
-    res.status(404).json({ message: "Category not found" });
-  }
-
-  res.status(200).json({ data: category });
-});
+exports.getSpecificCategory = GetSpecificDoc(CategoryModel);
 
 //@update category by id
 //@route get /api/categories/:id
 //@access Private
+
 exports.updateCategory = UpdateDoc(CategoryModel);
 
 // @desc    Delete specific category

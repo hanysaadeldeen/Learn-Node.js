@@ -4,7 +4,7 @@ const slugify = require("slugify");
 const AppError = require("../utils/AppError");
 
 const ApiFeature = require("../utils/apiFeature");
-const { DeleteDoc, UpdateDoc } = require("./handlersFactory");
+const { DeleteDoc, UpdateDoc, GetSpecificDoc } = require("./handlersFactory");
 
 exports.CreateBrand = asyncHandler(async (req, res) => {
   const { title, image } = req.body;
@@ -32,14 +32,7 @@ exports.getAllBrands = asyncHandler(async (req, res) => {
     data: brandResponse,
   });
 });
-exports.getSpecificBrand = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const brandResponse = await BrandSchema.findById(id);
-  if (!brandResponse) {
-    return next(new AppError("No brand found with this ID", 404));
-  }
-  res.status(200).json({ status: "success", data: brandResponse });
-});
+exports.getSpecificBrand = GetSpecificDoc(BrandSchema);
 
 // @desc    Update specific brand
 // @route   PUT /api/v1/brand/:id
