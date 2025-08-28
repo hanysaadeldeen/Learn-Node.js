@@ -1,37 +1,26 @@
 const asyncHandler = require("express-async-handler");
 const BrandSchema = require("../models/brandModel");
-const slugify = require("slugify");
-const AppError = require("../utils/AppError");
-
 const ApiFeature = require("../utils/apiFeature");
-const { DeleteDoc, UpdateDoc, GetSpecificDoc } = require("./handlersFactory");
 
-exports.CreateBrand = asyncHandler(async (req, res) => {
-  const { title, image } = req.body;
-  const brandResponse = await BrandSchema.create({
-    title,
-    slug: slugify(title),
-  });
-  res.status(201).json({ data: brandResponse });
-});
+const {
+  DeleteDoc,
+  UpdateDoc,
+  GetSpecificDoc,
+  CreateDoc,
+  GetDocs,
+} = require("./handlersFactory");
 
-exports.getAllBrands = asyncHandler(async (req, res) => {
-  const countDoc = await BrandSchema.countDocuments();
-  const apifeature = new ApiFeature(BrandSchema.find(), req.query)
-    .search()
-    .sort()
-    .paginate(countDoc);
+// @create  Brand
+// @route  post /api/brands
+// @access private
+exports.CreateBrand = CreateDoc(BrandSchema);
 
-  const { query, paginationResult } = apifeature;
-  const brandResponse = await query;
+// @get  Brand
+// @route  get /api/brands
+// @access public
 
-  res.status(200).json({
-    status: "success",
-    length: brandResponse.length,
-    paginationResult,
-    data: brandResponse,
-  });
-});
+exports.getAllBrands = GetDocs(BrandSchema);
+
 exports.getSpecificBrand = GetSpecificDoc(BrandSchema);
 
 // @desc    Update specific brand

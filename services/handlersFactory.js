@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const AppError = require("../utils/AppError");
+const ApiFeature = require("../utils/apiFeature");
 
 exports.DeleteDoc = (model) => {
   return asyncHandler(async (req, res, next) => {
@@ -63,5 +64,38 @@ exports.GetSpecificDoc = (model, options = {}) => {
     }
 
     res.status(200).json({ status: "success", data: response });
+  });
+};
+
+exports.CreateDoc = (model) => {
+  return asyncHandler(async (req, res, next) => {
+    if (req.body.title) req.body.slug = slugify(req.body.title);
+    else if (req.body.name) req.body.slug = slugify(req.body.name);
+
+    const response = await model.create(req.body);
+
+    res.status(201).json({ status: "success", data: response });
+  });
+};
+
+exports.GetDocs = (model, type) => {
+  return asyncHandler(async (req, res) => {
+    const countDoc = await model.countDocuments();
+
+    const apifeature = new ApiFeature(model.find(), req.query)
+      .search(type)
+      .paginate(countDoc)
+      .filter()
+      .sort()
+      .fields();
+
+    const { query, paginationResult } = apifeature;
+    const response = await query;
+    res.status(200).json({
+      status: "success",
+      length: response.length,
+      paginationResult,
+      data: response,
+    });
   });
 };

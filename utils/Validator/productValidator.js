@@ -3,6 +3,7 @@ const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const categoryModel = require("../../models/categoryModel");
 const subCategoryModel = require("../../models/subCategoryModel");
 const AppError = require("../AppError");
+const BrandSchema = require("../../models/brandModel");
 exports.createProductValidator = [
   // Title
   check("title")
@@ -142,11 +143,11 @@ exports.createProductValidator = [
     .optional()
     .isMongoId()
     .withMessage("Invalid Brand ID format")
-    .custom((brandId) => {
-      return BrandSchema.findById(brandId).then((brand) => {
+    .custom((id) => {
+      return BrandSchema.findById(id).then((brand) => {
         if (!brand) {
           return Promise.reject(
-            new Error(`Brand with ID ${brandId} does not exist`)
+            new Error(`Brand with ID ${id} does not exist`)
           );
         }
       });
