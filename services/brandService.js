@@ -1,6 +1,4 @@
-const asyncHandler = require("express-async-handler");
 const BrandSchema = require("../models/brandModel");
-const ApiFeature = require("../utils/apiFeature");
 
 const {
   DeleteDoc,

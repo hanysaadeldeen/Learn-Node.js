@@ -80,9 +80,13 @@ exports.CreateDoc = (model) => {
 
 exports.GetDocs = (model, type) => {
   return asyncHandler(async (req, res) => {
+    let filter = {};
+    if (req.filterObj) {
+      filter = req.filterObj;
+    }
     const countDoc = await model.countDocuments();
 
-    const apifeature = new ApiFeature(model.find(), req.query)
+    const apifeature = new ApiFeature(model.find(filter), req.query)
       .search(type)
       .paginate(countDoc)
       .filter()

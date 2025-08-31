@@ -6,6 +6,7 @@ const {
   UpdateDoc,
   GetSpecificDoc,
   CreateDoc,
+  GetDocs,
 } = require("./handlersFactory");
 
 exports.setCategoryIdtoBody = (req, res, next) => {
@@ -13,6 +14,14 @@ exports.setCategoryIdtoBody = (req, res, next) => {
   next();
 };
 
+// Nested route
+// GET /api/v1/categories/:categoryId/subcategories
+exports.createFilterObj = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.categoryId) filterObject = { category: req.params.categoryId };
+  req.filterObj = filterObject;
+  next();
+};
 // @create  subcategories
 // @route  post /api/subcategories
 // @access private
@@ -27,29 +36,11 @@ exports.getSpecificSubCategories = GetSpecificDoc(subCategoryModel, {
   populate: { path: "category", select: "name-_id" },
 });
 
-exports.getAllSubCategories = asyncHandler(async (req, res) => {
-  let filterForCategory = {};
-  if (req.params.categoryId) {
-    filterForCategory = { category: req.params.categoryId };
-  }
-  const countDoc = await subCategoryModel.countDocuments();
-  const apiFeature = new ApiFeature(
-    subCategoryModel.find(filterForCategory),
-    req.query
-  )
-    .paginate(countDoc)
-    .search()
-    .sort();
+// @desc    Get list of subcategories
+// @route   GET /api/v1/subcategories and With ID
+// @access  Public
 
-  const { query, paginationResult } = apiFeature;
-  const subCategories = await query;
-
-  res.status(200).json({
-    length: subCategories.length,
-    paginationResult,
-    subCategory: subCategories,
-  });
-});
+exports.getAllSubCategories = GetDocs(subCategoryModel);
 
 // @desc    Update specific subcategories
 // @route   PUT /api/v1/subcategories/:id
