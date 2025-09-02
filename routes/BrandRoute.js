@@ -1,10 +1,26 @@
 const express = require("express");
+// const multer = require("multer");
+// const upload = multer({ dest: "uploads/brands" });
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/brands");
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     cb(null, file.originalname);
+//   },
+// });
+
+// const upload = multer({ storage });
+
 const {
   CreateBrand,
   getAllBrands,
   getSpecificBrand,
   updateBrand,
   deleteBrand,
+  UploadBrandImg,
 } = require("../services/brandService");
 
 const {
@@ -16,7 +32,10 @@ const {
 
 const router = express.Router();
 
-router.route("/").post(createBrandValidator, CreateBrand).get(getAllBrands);
+router
+  .route("/")
+  .post(UploadBrandImg, createBrandValidator, CreateBrand)
+  .get(getAllBrands);
 router
   .route("/:id")
   .get(getSpecificBrandValidator, getSpecificBrand)
