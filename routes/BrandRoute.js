@@ -21,6 +21,7 @@ const {
   updateBrand,
   deleteBrand,
   UploadBrandImg,
+  ProcessBrandImg,
 } = require("../services/brandService");
 
 const {
@@ -29,12 +30,19 @@ const {
   updateSpecificBrandValidator,
   deleteSpecificBrandValidator,
 } = require("../utils/Validator/brandValidator");
+const { multerErrorHandler } = require("../middlewares/multerMiddleWare");
 
 const router = express.Router();
 
 router
   .route("/")
-  .post(UploadBrandImg, createBrandValidator, CreateBrand)
+  .post(
+    UploadBrandImg,
+    ProcessBrandImg,
+    createBrandValidator,
+    CreateBrand,
+    multerErrorHandler
+  )
   .get(getAllBrands);
 router
   .route("/:id")
