@@ -15,8 +15,8 @@ exports.CreateCategoryValidator = [
     .withMessage("category must be string")
     .isLength({ min: 3 })
     .withMessage("category min Length is 3")
-    .isLength({ max: 10 })
-    .withMessage("category max length is 10"),
+    .isLength({ max: 50 })
+    .withMessage("category max length is 50"),
   validatorMiddleWare,
 ];
 exports.UpdateCategoryValidator = [

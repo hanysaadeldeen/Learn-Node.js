@@ -1,7 +1,51 @@
+const path = require("path");
+
 const asyncHandler = require("express-async-handler");
+
 const slugify = require("slugify");
+const { v4: uuidv4 } = require("uuid");
+const sharp = require("sharp");
+const multer = require("multer");
+
 const AppError = require("../utils/AppError");
 const ApiFeature = require("../utils/apiFeature");
+const { fileFilterImages } = require("../middlewares/multerMiddleWare");
+
+// upload BrandImg diskStorage
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "uploads/brands");
+//   },
+//   filename: function (req, file, cb) {
+//     const extention = file.mimetype.split("/")[1];
+//     const fileName = `brand-${uuidv4()}-${Date.now()}-.${extention}`;
+//     cb(null, fileName);
+//   },
+// });
+
+// process with memoryStorage and Sharp
+exports.ProcessImgGlobal = (imgType) => {
+  return asyncHandler(async (req, res, next) => {
+    if (!req.file) return next();
+
+    const filename = `${imgType}-${uuidv4()}-${Date.now()}.webp`;
+
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .webp({ quality: 70 })
+      .toFile(path.join(`uploads/${imgType}`, filename));
+
+    // attach filename to request body so controller can use it
+    req.body.image = filename;
+
+    next();
+  });
+};
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage, fileFilter: fileFilterImages });
+
+exports.UploadImgGlobal = upload.single("image");
 
 exports.DeleteDoc = (model) => {
   return asyncHandler(async (req, res, next) => {
@@ -37,7 +81,6 @@ exports.GetSpecificDoc = (model, options = {}) => {
     const { id } = req.params;
     let response;
 
-    // لو محدد field → هجيب list بالـ field
     if (options.field) {
       response = await model.find({ [options.field]: id });
 

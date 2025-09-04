@@ -1,4 +1,5 @@
 const multer = require("multer");
+const AppError = require("../utils/AppError");
 
 exports.multerErrorHandler = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -15,8 +16,8 @@ exports.multerErrorHandler = (err, req, res, next) => {
   next();
 };
 
-exportsfileFilterImages = function (req, file, cb) {
-  if (file.mimetype.startsWith("images")) {
+exports.fileFilterImages = function (req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
     cb(null, true);
   } else {
     cb(new AppError("only images allowed", 404));

@@ -22,6 +22,7 @@ const {
   deleteBrand,
   UploadBrandImg,
   ProcessBrandImg,
+  ProcessImg,
 } = require("../services/brandService");
 
 const {
@@ -31,14 +32,18 @@ const {
   deleteSpecificBrandValidator,
 } = require("../utils/Validator/brandValidator");
 const { multerErrorHandler } = require("../middlewares/multerMiddleWare");
+const {
+  ProcessImgGlobal,
+  UploadImgGlobal,
+} = require("../services/handlersFactory");
 
 const router = express.Router();
 
 router
   .route("/")
   .post(
-    UploadBrandImg,
-    ProcessBrandImg,
+    UploadImgGlobal,
+    ProcessImgGlobal("brands"),
     createBrandValidator,
     CreateBrand,
     multerErrorHandler
@@ -47,6 +52,11 @@ router
 router
   .route("/:id")
   .get(getSpecificBrandValidator, getSpecificBrand)
-  .put(updateSpecificBrandValidator, updateBrand)
+  .put(
+    UploadImgGlobal,
+    ProcessImgGlobal("brands"),
+    updateSpecificBrandValidator,
+    updateBrand
+  )
   .delete(deleteSpecificBrandValidator, deleteBrand);
 module.exports = router;
