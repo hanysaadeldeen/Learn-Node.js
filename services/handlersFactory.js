@@ -9,7 +9,10 @@ const multer = require("multer");
 
 const AppError = require("../utils/AppError");
 const ApiFeature = require("../utils/apiFeature");
-const { fileFilterImages } = require("../middlewares/multerMiddleWare");
+const {
+  fileFilterImages,
+  uploadSingle,
+} = require("../middlewares/multerMiddleWare");
 
 // upload BrandImg diskStorage
 // const storage = multer.diskStorage({
@@ -42,10 +45,7 @@ exports.ProcessImgGlobal = (imgType) => {
   });
 };
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage, fileFilter: fileFilterImages });
-
-exports.UploadImgGlobal = upload.single("image");
+exports.UploadImgGlobal = uploadSingle("image");
 
 exports.DeleteDoc = (model) => {
   return asyncHandler(async (req, res, next) => {

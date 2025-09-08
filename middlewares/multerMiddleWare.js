@@ -23,3 +23,17 @@ exports.fileFilterImages = function (req, file, cb) {
     cb(new AppError("only images allowed", 404));
   }
 };
+
+exports.uploadSingle = (fieldType) => {
+  const storage = multer.memoryStorage();
+  const upload = multer({ storage, fileFilter: exports.fileFilterImages });
+
+  return upload.single(fieldType);
+};
+
+exports.uploadImagesArray = (fieldType) => {
+  const storage = multer.memoryStorage();
+  const upload = multer({ storage, fileFilter: exports.fileFilterImages });
+
+  return upload.array(fieldType, 10);
+};

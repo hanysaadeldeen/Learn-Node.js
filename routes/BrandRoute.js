@@ -20,9 +20,6 @@ const {
   getSpecificBrand,
   updateBrand,
   deleteBrand,
-  UploadBrandImg,
-  ProcessBrandImg,
-  ProcessImg,
 } = require("../services/brandService");
 
 const {
