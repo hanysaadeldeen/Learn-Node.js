@@ -82,10 +82,10 @@ const ProductSchema = mongoose.Schema(
 );
 
 function SaveImage(doc) {
-  doc.imgCover = `${process.env.DATA_BASE_URL}/products/${doc.imgCover}`;
+  doc.imgCover = `${process.env.DOMAIN_URL}/products/${doc.imgCover}`;
   if (doc.images && doc.images.length > 0) {
     doc.images = doc.images.map((file) => {
-      return (doc.images = `${process.env.DATA_BASE_URL}/products/${file}`);
+      return (doc.images = `${process.env.DOMAIN_URL}/products/${file}`);
     });
   }
 }

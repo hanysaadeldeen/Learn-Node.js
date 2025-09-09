@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const DB = process.env.dataBase_Url;
+const DB = process.env.DB_Url;
 const dbConnection = () => {
   mongoose.connect(DB).then((con) => {
     // console.log("Connected to MongoDB", con.connection.host);
