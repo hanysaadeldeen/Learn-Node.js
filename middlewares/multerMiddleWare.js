@@ -24,16 +24,16 @@ exports.fileFilterImages = function (req, file, cb) {
   }
 };
 
-exports.uploadSingle = (fieldType) => {
+const multerStorage = () => {
   const storage = multer.memoryStorage();
   const upload = multer({ storage, fileFilter: exports.fileFilterImages });
-
-  return upload.single(fieldType);
+  return upload;
 };
 
-exports.uploadImagesArray = (fieldType) => {
-  const storage = multer.memoryStorage();
-  const upload = multer({ storage, fileFilter: exports.fileFilterImages });
+exports.uploadSingle = (fieldType) => {
+  return multerStorage().single(fieldType);
+};
 
-  return upload.array(fieldType, 10);
+exports.uploadImagesArray = (arrayOfFields) => {
+  return multerStorage().fields(arrayOfFields);
 };

@@ -5,13 +5,12 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const { v4: uuidv4 } = require("uuid");
 const sharp = require("sharp");
-const multer = require("multer");
 
 const AppError = require("../utils/AppError");
 const ApiFeature = require("../utils/apiFeature");
 const {
-  fileFilterImages,
   uploadSingle,
+  uploadImagesArray,
 } = require("../middlewares/multerMiddleWare");
 
 // upload BrandImg diskStorage
@@ -40,12 +39,47 @@ exports.ProcessImgGlobal = (imgType) => {
 
     // attach filename to request body so controller can use it
     req.body.image = filename;
-
     next();
   });
 };
 
+exports.ProcessingImgesFiles = () => {
+  return asyncHandler(async (req, res, next) => {
+    if (!req.files) return next();
+
+    const imgCoverFilename = `products-cover-${uuidv4()}-${Date.now()}.webp`;
+    await sharp(req.files.imgCover[0].buffer)
+      .resize(600, 600)
+      .webp({ quality: 70 })
+      .toFile(path.join(`uploads/products`, imgCoverFilename));
+
+    req.body.imgCover = imgCoverFilename;
+
+    if (req.files.images) {
+      const images = await Promise.all(
+        req.files.images.map(async (file) => {
+          const filename = `products-${uuidv4()}-${Date.now()}.webp`;
+          await sharp(file.buffer)
+            .resize(600, 600)
+            .webp({ quality: 70 })
+            .toFile(path.join(`uploads/products`, filename));
+          return filename;
+        })
+      );
+      req.body.images = images;
+    }
+
+    next();
+  });
+};
+// for upload  Single Image
 exports.UploadImgGlobal = uploadSingle("image");
+
+// for upload fileds of Image
+exports.UploadImagesfileds = uploadImagesArray([
+  { name: "imgCover", maxCount: 1 },
+  { name: "images", maxCount: 8 },
+]);
 
 exports.DeleteDoc = (model) => {
   return asyncHandler(async (req, res, next) => {
@@ -115,6 +149,7 @@ exports.CreateDoc = (model) => {
     if (req.body.title) req.body.slug = slugify(req.body.title);
     else if (req.body.name) req.body.slug = slugify(req.body.name);
 
+    console.log(req.body);
     const response = await model.create(req.body);
 
     res.status(201).json({ status: "success", data: response });

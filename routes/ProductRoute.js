@@ -13,18 +13,31 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../services/ProductService");
+const {
+  ProcessingImgesFiles,
+  UploadImagesfileds,
+} = require("../services/handlersFactory");
 
 const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
-  .post(createProductValidator, createProduct)
-
+  .post(
+    UploadImagesfileds,
+    ProcessingImgesFiles(),
+    createProductValidator,
+    createProduct
+  )
   .get(getAllProducts);
 
 router
   .route("/:id")
   .get(getSpecificProductValidator, getProduct)
-  .put(updateProductValidator, updateProduct)
+  .put(
+    UploadImagesfileds,
+    ProcessingImgesFiles(),
+    updateProductValidator,
+    updateProduct
+  )
   .delete(deleteProductValidator, deleteProduct);
 module.exports = router;

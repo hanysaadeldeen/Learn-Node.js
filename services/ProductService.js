@@ -1,3 +1,4 @@
+const { uploadImagesArray } = require("../middlewares/multerMiddleWare");
 const ProductModel = require("../models/ProductModel");
 const {
   DeleteDoc,

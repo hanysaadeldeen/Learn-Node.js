@@ -81,5 +81,22 @@ const ProductSchema = mongoose.Schema(
   }
 );
 
+function SaveImage(doc) {
+  doc.imgCover = `${process.env.DATA_BASE_URL}/products/${doc.imgCover}`;
+  if (doc.images && doc.images.length > 0) {
+    doc.images = doc.images.map((file) => {
+      return (doc.images = `${process.env.DATA_BASE_URL}/products/${file}`);
+    });
+  }
+}
+
+ProductSchema.post("init", function (doc) {
+  SaveImage(doc);
+});
+
+ProductSchema.post("save", function (doc) {
+  SaveImage(doc);
+});
+
 const ProductModel = mongoose.model("Product", ProductSchema);
 module.exports = ProductModel;

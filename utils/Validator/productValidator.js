@@ -92,7 +92,7 @@ exports.createProductValidator = [
     .isInt({ min: 0 })
     .withMessage("Rating count must be a non-negative integer"),
 
-  // category
+  //! category
   check("category")
     .notEmpty()
     .withMessage("Category is required")
@@ -107,7 +107,7 @@ exports.createProductValidator = [
       }
     }),
 
-  // subCategory
+  // !subCategory
   check("subCategory")
     .optional()
     .isArray()
