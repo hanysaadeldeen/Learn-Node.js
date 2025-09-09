@@ -32,7 +32,7 @@ const ProductSchema = mongoose.Schema(
     },
     imgCover: {
       type: String,
-      required: [false, "image Cover is required"],
+      required: false,
     },
     images: {
       type: [String],

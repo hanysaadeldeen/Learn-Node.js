@@ -38,7 +38,11 @@ exports.ProcessImgGlobal = (imgType) => {
       .toFile(path.join(`uploads/${imgType}`, filename));
 
     // attach filename to request body so controller can use it
-    req.body.image = filename;
+    if (imgType !== "users") {
+      req.body.image = filename;
+    } else {
+      req.body.profilePhoto = filename;
+    }
     next();
   });
 };
@@ -150,6 +154,8 @@ exports.CreateDoc = (model) => {
     else if (req.body.name) req.body.slug = slugify(req.body.name);
 
     console.log(req.body);
+    console.log(model);
+
     const response = await model.create(req.body);
 
     res.status(201).json({ status: "success", data: response });

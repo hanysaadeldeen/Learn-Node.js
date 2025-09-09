@@ -4,11 +4,8 @@ const express = require("express");
 const morgan = require("morgan");
 const qs = require("qs");
 const { query, validationResult } = require("express-validator");
+const routes = require("./routes/index");
 
-const categoryRoute = require("./routes/CagetoryRoute");
-const SubCategoryRoute = require("./routes/SubCategoryRoute");
-const ProductRoute = require("./routes/ProductRoute");
-const BrandRoute = require("./routes/BrandRoute");
 const { globalError } = require("./middlewares/errorMiddleWare");
 
 const app = express();
@@ -25,14 +22,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // routes
-app.use("/api/v1/categories", categoryRoute);
-app.use("/api/v1/subcategories", SubCategoryRoute);
-app.use("/api/v1/brand", BrandRoute);
-app.use("/api/v1/product", ProductRoute);
-
-// app.get("/hello", query("person").notEmpty(), (req, res) => {
-//   res.send(`Hello, ${req.query.person}!`);
-// });
+app.use("/api/v1", routes);
 
 app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   const result = validationResult(req);
