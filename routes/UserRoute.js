@@ -5,18 +5,18 @@ const {
   getAllUserss,
   getSpecificUsers,
   updateUsers,
-  deleteUsers,
+  unActiveUsers,
   UploadUserImage,
 } = require("../services/userService");
 
-// const {
-//   createBrandValidator,
-//   getSpecificBrandValidator,
-//   updateSpecificBrandValidator,
-//   deleteSpecificBrandValidator,
-// } = require("../utils/Validator/brandValidator");
-const { multerErrorHandler } = require("../middlewares/multerMiddleWare");
 const { ProcessImgGlobal } = require("../services/handlersFactory");
+
+const { multerErrorHandler } = require("../middlewares/multerMiddleWare");
+
+const {
+  createUserValidator,
+  updateAndUnActiveUserValidator,
+} = require("../utils/Validator/userValidator");
 
 const router = express.Router();
 
@@ -25,13 +25,19 @@ router
   .post(
     UploadUserImage,
     ProcessImgGlobal("users"),
+    createUserValidator,
     CreateUsers,
     multerErrorHandler
   )
   .get(getAllUserss);
 router
   .route("/:id")
-  .get(getSpecificUsers)
-  .put(UploadUserImage, ProcessImgGlobal("users"), updateUsers)
-  .delete(deleteUsers);
+  .get(updateAndUnActiveUserValidator, getSpecificUsers)
+  .put(
+    UploadUserImage,
+    ProcessImgGlobal("users"),
+    updateAndUnActiveUserValidator,
+    updateUsers
+  )
+  .delete(updateAndUnActiveUserValidator, unActiveUsers);
 module.exports = router;

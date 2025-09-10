@@ -12,6 +12,7 @@ const {
   uploadSingle,
   uploadImagesArray,
 } = require("../middlewares/multerMiddleWare");
+const { log } = require("console");
 
 // upload BrandImg diskStorage
 // const storage = multer.diskStorage({
@@ -152,9 +153,6 @@ exports.CreateDoc = (model) => {
   return asyncHandler(async (req, res, next) => {
     if (req.body.title) req.body.slug = slugify(req.body.title);
     else if (req.body.name) req.body.slug = slugify(req.body.name);
-
-    console.log(req.body);
-    console.log(model);
 
     const response = await model.create(req.body);
 

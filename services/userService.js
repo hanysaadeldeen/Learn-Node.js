@@ -1,8 +1,9 @@
+const asyncHandler = require("express-async-handler");
+
 const { uploadSingle } = require("../middlewares/multerMiddleWare");
 const UserSchema = require("../models/userModel");
 
 const {
-  DeleteDoc,
   UpdateDoc,
   GetSpecificDoc,
   CreateDoc,
@@ -35,7 +36,22 @@ exports.getSpecificUsers = GetSpecificDoc(UserSchema);
 
 exports.updateUsers = UpdateDoc(UserSchema);
 
-// @desc    Delete specific Users
-// @route   DELETE /api/v1/Users/:id
+// @desc    unActive specific Users
+// @route   update /api/v1/Users/:id
 // @access  Private
-exports.deleteUsers = DeleteDoc(UserSchema);
+exports.unActiveUsers = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const response = await UserSchema.findByIdAndUpdate(
+    id,
+    {
+      active: false,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!response) {
+    return next(res.status(404).json({ message: "Document not found" }));
+  }
+  res.status(200).json({ status: "success", data: response });
+});

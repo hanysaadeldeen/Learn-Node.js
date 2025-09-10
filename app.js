@@ -7,7 +7,7 @@ const { query, validationResult } = require("express-validator");
 const routes = require("./routes/index");
 
 const { globalError } = require("./middlewares/errorMiddleWare");
-
+const globalErrorHandler = require("./services/errorController");
 const app = express();
 
 // middleWares
@@ -24,6 +24,8 @@ if (process.env.NODE_ENV === "development") {
 // routes
 app.use("/api/v1", routes);
 
+app.use(globalErrorHandler);
+
 app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   const result = validationResult(req);
   if (result.isEmpty()) {
@@ -31,10 +33,6 @@ app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   }
   res.send({ errors: result.mapped() });
 });
-
-// app.all("*", (req, res, next) => {
-//   next(new AppError("router didn't match with any route", 404));
-// });
 
 app.use(globalError);
 
