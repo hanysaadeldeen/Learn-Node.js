@@ -1,6 +1,8 @@
 const { check, param } = require("express-validator");
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
-
+const UserModel = require("../../models/userModel");
+const AppError = require("../AppError");
+// const UserModel
 exports.createUserValidator = [
   check("name")
     .notEmpty()
@@ -14,27 +16,32 @@ exports.createUserValidator = [
     .withMessage("user email is required")
     .isEmail()
     .withMessage("invalid email format")
-    .isLowercase()
-    .withMessage("email must be lowercase"),
+    .custom((val) =>
+      UserModel.findOne({ email: val }).then((user) => {
+        if (user) {
+          return Promise.reject(new Error("this user email already exists"));
+        }
+      })
+    ),
   check("password")
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6 })
     .withMessage("password must be at least 6 characters"),
-  check("phone")
+
+  check("passwordConfirm")
     .notEmpty()
-    .withMessage("user phone is required")
-    .isLength({ min: 6 })
-    .withMessage("user phone must be at least 6 numbers")
-    .isLength({ max: 15 })
-    .withMessage("user phone must not be more than 15 numbers"),
+    .withMessage("passwordConfirm is required")
+    .custom((val, { req }) => {
+      if (val !== req.body.password) {
+        throw new AppError("passwordConfirmation didn't math password", 400);
+      }
+      return true;
+    }),
   check("phone")
-    .notEmpty()
-    .withMessage("user phone is required")
-    .isLength({ min: 6, max: 15 })
-    .withMessage("phone must be between 6 and 15 digits")
-    .isNumeric()
-    .withMessage("phone must contain only numbers"),
+    .optional()
+    .isMobilePhone(["ar-EG", "ar-SA"])
+    .withMessage("phone number must be egypt number or saudi number"),
   check("profilePhoto")
     .optional()
     .isString()

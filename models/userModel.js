@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -52,6 +53,12 @@ const setImageURL = (doc) => {
     doc.profilePhoto = img;
   }
 };
+
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 5);
+  next();
+});
 
 UserSchema.post("init", function (doc) {
   setImageURL(doc);

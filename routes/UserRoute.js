@@ -4,9 +4,10 @@ const {
   CreateUsers,
   getAllUserss,
   getSpecificUsers,
-  updateUsers,
+  updateUser,
   unActiveUsers,
   UploadUserImage,
+  updateUserPassword,
 } = require("../services/userService");
 
 const { ProcessImgGlobal } = require("../services/handlersFactory");
@@ -19,6 +20,8 @@ const {
 } = require("../utils/Validator/userValidator");
 
 const router = express.Router();
+
+router.put("/updatePassword/:id", updateUserPassword);
 
 router
   .route("/")
@@ -37,7 +40,7 @@ router
     UploadUserImage,
     ProcessImgGlobal("users"),
     updateAndUnActiveUserValidator,
-    updateUsers
+    updateUser
   )
   .delete(updateAndUnActiveUserValidator, unActiveUsers);
 module.exports = router;

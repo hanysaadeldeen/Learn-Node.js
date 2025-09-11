@@ -12,7 +12,6 @@ const {
   uploadSingle,
   uploadImagesArray,
 } = require("../middlewares/multerMiddleWare");
-const { log } = require("console");
 
 // upload BrandImg diskStorage
 // const storage = multer.diskStorage({
@@ -145,6 +144,10 @@ exports.GetSpecificDoc = (model, options = {}) => {
       return next(new AppError(`no document found with id = ${id}`, 404));
     }
 
+    if (response && response.password) {
+      response.password = undefined;
+    }
+
     res.status(200).json({ status: "success", data: response });
   });
 };
@@ -177,6 +180,7 @@ exports.GetDocs = (model, type) => {
 
     const { query, paginationResult } = apifeature;
     const response = await query;
+
     res.status(200).json({
       status: "success",
       length: response.length,

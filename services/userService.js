@@ -1,4 +1,6 @@
 const asyncHandler = require("express-async-handler");
+const slugify = require("slugify");
+const bcrypt = require("bcryptjs");
 
 const { uploadSingle } = require("../middlewares/multerMiddleWare");
 const UserSchema = require("../models/userModel");
@@ -34,7 +36,47 @@ exports.getSpecificUsers = GetSpecificDoc(UserSchema);
 // @route   PUT /api/v1/Users/userId
 // @access  Private
 
-exports.updateUsers = UpdateDoc(UserSchema);
+exports.updateUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  if (req.body.name) {
+    req.body.slug = slugify(req.body.name);
+  }
+
+  const response = await UserSchema.findByIdAndUpdate(
+    id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      profilePhoto: req.body.profilePhoto,
+      role: req.body.role,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!response) {
+    return next(res.status(404).json({ message: "Document not found" }));
+  }
+  res.status(200).json({ status: "success", data: response });
+});
+exports.updateUserPassword = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const response = await UserSchema.findByIdAndUpdate(
+    req.params.id,
+    {
+      password: await bcrypt.hash(req.body.password, 5),
+    },
+    {
+      new: true,
+    }
+  );
+  if (!response) {
+    return next(res.status(404).json({ message: "Document not found" }));
+  }
+  res.status(200).json({ status: "success", data: response });
+});
 
 // @desc    unActive specific Users
 // @route   update /api/v1/Users/:id
