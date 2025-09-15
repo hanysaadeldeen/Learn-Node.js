@@ -4,6 +4,8 @@ const bcrypt = require("bcryptjs");
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const UserModel = require("../../models/userModel");
 const AppError = require("../AppError");
+const slugify = require("slugify");
+
 // const UserModel
 exports.createUserValidator = [
   check("name")
@@ -12,7 +14,11 @@ exports.createUserValidator = [
     .isString()
     .withMessage("user name must be letters")
     .isLength({ min: 2, max: 20 })
-    .withMessage("user name must be at least 2 characters and max is 20"),
+    .withMessage("user name must be at least 2 characters and max is 20")
+    .custom((val, req) => {
+      req.body.slug = slugify(val);
+      return true;
+    }),
   check("email")
     .notEmpty()
     .withMessage("user email is required")
