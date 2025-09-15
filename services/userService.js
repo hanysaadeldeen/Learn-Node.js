@@ -61,8 +61,6 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data: response });
 });
 exports.updateUserPassword = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-
   const response = await UserSchema.findByIdAndUpdate(
     req.params.id,
     {

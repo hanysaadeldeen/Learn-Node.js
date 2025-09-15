@@ -17,11 +17,16 @@ const { multerErrorHandler } = require("../middlewares/multerMiddleWare");
 const {
   createUserValidator,
   updateAndUnActiveUserValidator,
+  updateUserPasswordValidator,
 } = require("../utils/Validator/userValidator");
 
 const router = express.Router();
 
-router.put("/updatePassword/:id", updateUserPassword);
+router.put(
+  "/updatePassword/:id",
+  updateUserPasswordValidator,
+  updateUserPassword
+);
 
 router
   .route("/")

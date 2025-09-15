@@ -31,6 +31,3 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
   });
 });
-
-// start tomorrow from 75 youtube -- udemy
-// Insert & Delete Products Dummy Data Using Seeder Script
