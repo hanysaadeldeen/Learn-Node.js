@@ -27,7 +27,7 @@ exports.signUpValidator = [
     .custom((val) =>
       UserModel.findOne({ email: val }).then((user) => {
         if (user) {
-          return Promise.reject(new Error("this user email already exists"));
+          throw new AppError("this user email already exists", 400);
         }
       })
     ),
@@ -52,5 +52,20 @@ exports.signUpValidator = [
     .isString()
     .withMessage("user profile Photo must be a string (URL or filename)"),
 
+  validatorMiddleWare,
+];
+
+exports.logInValidator = [
+  check("email")
+    .notEmpty()
+    .withMessage("user email is required")
+    .isEmail()
+    .withMessage("invalid email format"),
+  check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6 })
+    .withMessage("password must be at least 6 characters"),
+  ,
   validatorMiddleWare,
 ];

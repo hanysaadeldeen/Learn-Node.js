@@ -1,7 +1,6 @@
 const AppError = require("../utils/AppError");
 
 const handleDuplicateFieldsDB = (err) => {
-  console.log("here");
   const field = Object.keys(err.keyValue)[0];
   const value = err.keyValue[field];
   const message = `${field} '${value}' already exists. Please use another ${field}.`;
@@ -9,7 +8,6 @@ const handleDuplicateFieldsDB = (err) => {
 };
 
 const globalErrorHandler = (err, req, res, next) => {
-  console.log("here222");
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
