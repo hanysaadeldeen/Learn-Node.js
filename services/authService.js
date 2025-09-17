@@ -49,29 +49,7 @@ exports.logIn = asyncHandler(async (req, res, next) => {
 });
 
 exports.protect = asyncHandler(async (req, res, next) => {
-  // let token;
-  // if (
-  //   req.headers.authorization &&
-  //   req.headers.authorization.startsWith("Bearer")
-  // ) {
-  //   token = req.headers.authorization.split(" ")[1];
-  // } else {
-  //   console.log(req.headers.authorization);
-  // }
-
-  // if (!token) {
-  //   return new AppError(
-  //     "You are not logged in! Please log in to get access.",
-  //     401
-  //   );
-  // }
-
-  // const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  // // const currentUser = await UserSchema.findById(decoded.userId);
-  // // console.log(currentUser);
-
-  // next();
-
+  // 1) Getting token and check of it's there
   let token;
   if (
     req.headers.authorization &&
@@ -89,7 +67,18 @@ exports.protect = asyncHandler(async (req, res, next) => {
   // 2) verify token
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  console.log(decoded); // { userId: '...', userName: '...', iat: ..., exp: ... }
+  // 2) verify if user still exists
+  const currentUser = await UserSchema.findById(decoded.userId);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        "The user that belong to this token does no longer exist",
+        401
+      )
+    );
+  }
+  console.log(currentUser);
 
+  req.user = currentUser;
   next();
 });

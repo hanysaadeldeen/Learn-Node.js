@@ -14,6 +14,11 @@ const globalErrorHandler = (err, req, res, next) => {
   // Mongo duplicate key error
   if (err.code === 11000) err = handleDuplicateFieldsDB(err);
 
+  if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
+    err.message = "Please log in again!";
+    // next();
+  }
+
   res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
