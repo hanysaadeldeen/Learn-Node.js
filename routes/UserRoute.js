@@ -27,25 +27,40 @@ router.put(
   updateUserPasswordValidator,
   updateUserPassword
 );
+const { protect, allowedTo } = require("../services/authService");
 
 router
   .route("/")
   .post(
+    protect,
+    allowedTo(["admin", "manager"]),
     UploadUserImage,
     ProcessImgGlobal("users"),
     createUserValidator,
     CreateUsers,
     multerErrorHandler
   )
-  .get(getAllUserss);
+  .get(protect, allowedTo(["admin", "manager"]), getAllUserss);
 router
   .route("/:id")
-  .get(updateAndUnActiveUserValidator, getSpecificUsers)
+  .get(
+    protect,
+    allowedTo(["admin", "manager"]),
+    updateAndUnActiveUserValidator,
+    getSpecificUsers
+  )
   .put(
+    protect,
+    allowedTo(["admin", "manager"]),
     UploadUserImage,
     ProcessImgGlobal("users"),
     updateAndUnActiveUserValidator,
     updateUser
   )
-  .delete(updateAndUnActiveUserValidator, unActiveUsers);
+  .delete(
+    protect,
+    allowedTo(["admin", "manager"]),
+    updateAndUnActiveUserValidator,
+    unActiveUsers
+  );
 module.exports = router;

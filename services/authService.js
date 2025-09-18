@@ -88,9 +88,6 @@ exports.protect = asyncHandler(async (req, res, next) => {
       currentUser.passwordChangedAt.getTime() / 1000,
       10
     );
-
-    console.log(userPasswordDate, decoded.iat);
-
     if (userPasswordDate > decoded.iat) {
       return next(new AppError("user Change Password Please login ", 401));
     }
@@ -98,4 +95,37 @@ exports.protect = asyncHandler(async (req, res, next) => {
 
   req.user = currentUser;
   next();
+});
+
+exports.allowedTo = (allowedTo) =>
+  asyncHandler(async (req, res, next) => {
+    if (!allowedTo.includes(req.user.role)) {
+      return next(new AppError("you are not allowed to make this action", 403));
+    }
+    next();
+  });
+
+exports.forgetPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const checkUserExists = await UserSchema.findOne({ email });
+  if (!checkUserExists) {
+    return next(new AppError(`this Email:${email} didn't exits`, 404));
+  }
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  ((checkUserExists.resetCode = resetCode),
+    (checkUserExists.resetCodeExpires = Date.now() + 10 * 60 * 1000)); // بعد 10 دقايق
+  await checkUserExists.save();
+  console.log(checkUserExists);
+});
+
+exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
+  const code = req.body.code;
+  const checkUserExists = await UserSchema.findOne({
+    resetCode: code,
+  });
+  if (!checkUserExists) {
+    return next(new AppError(`this code:${code} is wrong`, 404));
+  }
+  console.log("updated");
 });

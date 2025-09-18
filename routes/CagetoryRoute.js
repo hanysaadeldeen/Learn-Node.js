@@ -20,6 +20,7 @@ const {
   ProcessImgGlobal,
   UploadImgGlobal,
 } = require("../services/handlersFactory");
+const { protect, allowedTo } = require("../services/authService");
 
 const router = express.Router();
 
@@ -30,6 +31,8 @@ router
   .route("/")
   .get(getCategories)
   .post(
+    protect,
+    allowedTo(["admin", "manager"]),
     UploadImgGlobal,
     ProcessImgGlobal("category"),
     CreateCategoryValidator,
@@ -39,10 +42,17 @@ router
   .route("/:id")
   .get(GetCategoryValidator, getSpecificCategory)
   .put(
+    protect,
+    allowedTo(["admin", "manager"]),
     UploadImgGlobal,
     ProcessImgGlobal("category"),
     UpdateCategoryValidator,
     updateCategory
   )
-  .delete(DeleteCategoryValidator, deleteCategory);
+  .delete(
+    protect,
+    allowedTo(["admin", "manager"]),
+    DeleteCategoryValidator,
+    deleteCategory
+  );
 module.exports = router;

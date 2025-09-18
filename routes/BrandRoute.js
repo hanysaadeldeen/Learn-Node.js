@@ -33,13 +33,15 @@ const {
   ProcessImgGlobal,
   UploadImgGlobal,
 } = require("../services/handlersFactory");
-const { protect } = require("../services/authService");
+const { protect, allowedTo } = require("../services/authService");
 
 const router = express.Router();
 
 router
   .route("/")
   .post(
+    protect,
+    allowedTo(["admin", "manager"]),
     UploadImgGlobal,
     ProcessImgGlobal("brands"),
     createBrandValidator,
@@ -52,10 +54,16 @@ router
   .get(getSpecificBrandValidator, getSpecificBrand)
   .put(
     protect,
+    allowedTo(["admin", "manager"]),
     UploadImgGlobal,
     ProcessImgGlobal("brands"),
     updateSpecificBrandValidator,
     updateBrand
   )
-  .delete(protect, deleteSpecificBrandValidator, deleteBrand);
+  .delete(
+    protect,
+    allowedTo(["admin", "manager"]),
+    deleteSpecificBrandValidator,
+    deleteBrand
+  );
 module.exports = router;
