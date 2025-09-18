@@ -156,9 +156,7 @@ exports.CreateDoc = (model) => {
   return asyncHandler(async (req, res, next) => {
     if (req.body.title) req.body.slug = slugify(req.body.title);
     else if (req.body.name) req.body.slug = slugify(req.body.name);
-
     const response = await model.create(req.body);
-
     res.status(201).json({ status: "success", data: response });
   });
 };

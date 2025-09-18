@@ -12,6 +12,7 @@ exports.signUp = asyncHandler(async (req, res, next) => {
     email,
     password,
     profilePhoto,
+    passwordChangedAt: Date.now(),
   });
 
   const token = jwt.sign(
@@ -28,7 +29,9 @@ exports.signUp = asyncHandler(async (req, res, next) => {
 exports.logIn = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await UserSchema.findOne({ email });
+  const user = await UserSchema.findOne({
+    email,
+  });
 
   if (!user) {
     return next(new AppError("Invalid email or password", 401));
@@ -77,7 +80,21 @@ exports.protect = asyncHandler(async (req, res, next) => {
       )
     );
   }
-  console.log(currentUser);
+
+  // check if user Change Password After login
+
+  if (currentUser.passwordChangedAt) {
+    const userPasswordDate = parseInt(
+      currentUser.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    console.log(userPasswordDate, decoded.iat);
+
+    if (userPasswordDate > decoded.iat) {
+      return next(new AppError("user Change Password Please login ", 401));
+    }
+  }
 
   req.user = currentUser;
   next();

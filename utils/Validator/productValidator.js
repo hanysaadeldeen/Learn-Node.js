@@ -1,9 +1,11 @@
 const { check, param } = require("express-validator");
+const slugify = require("slugify");
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const categoryModel = require("../../models/categoryModel");
 const subCategoryModel = require("../../models/subCategoryModel");
 const AppError = require("../AppError");
 const BrandSchema = require("../../models/brandModel");
+
 exports.createProductValidator = [
   // Title
   check("title")
@@ -12,12 +14,12 @@ exports.createProductValidator = [
     .isLength({ min: 3 })
     .withMessage("Product title must be at least 3 characters")
     .isLength({ max: 30 })
-    .withMessage("Product title must be at most 30 characters"),
-
-  // Slug
-  // check("slug")
-  //   .notEmpty().withMessage("Product slug is required"),
-
+    .withMessage("Product title must be at most 30 characters")
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val, { lower: true });
+      return true;
+    }),
+  ,
   // Price Before
   check("priceBefore")
     .notEmpty()
@@ -125,7 +127,6 @@ exports.createProductValidator = [
           const subCategoryIdTest = await subCategoryModel.findById(id);
           if (!subCategoryIdTest) {
             throw new AppError(`subCategory with ID ${id} does not exist`, 404);
-            // throw new Error(`subCategory with ID ${id} does not exist`);
           }
           if (subCategoryIdTest.category.toString() !== categoryId) {
             throw new AppError(

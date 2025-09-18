@@ -1,10 +1,9 @@
-const { check, param } = require("express-validator");
-const bcrypt = require("bcryptjs");
+const { check } = require("express-validator");
+const slugify = require("slugify");
 
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const UserModel = require("../../models/userModel");
 const AppError = require("../AppError");
-const slugify = require("slugify");
 
 // const UserModel
 exports.signUpValidator = [

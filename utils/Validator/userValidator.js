@@ -1,10 +1,10 @@
 const { check, param } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const slugify = require("slugify");
 
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 const UserModel = require("../../models/userModel");
 const AppError = require("../AppError");
-const slugify = require("slugify");
 
 // const UserModel
 exports.createUserValidator = [
@@ -15,8 +15,8 @@ exports.createUserValidator = [
     .withMessage("user name must be letters")
     .isLength({ min: 2, max: 20 })
     .withMessage("user name must be at least 2 characters and max is 20")
-    .custom((val, req) => {
-      req.body.slug = slugify(val);
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val, { lower: true });
       return true;
     }),
   check("email")

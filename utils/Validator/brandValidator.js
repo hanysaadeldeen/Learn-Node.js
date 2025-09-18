@@ -1,4 +1,5 @@
 const { check, param } = require("express-validator");
+const slugify = require("slugify");
 
 const validatorMiddleWare = require("../../middlewares/validatorMiddleWare");
 
@@ -9,7 +10,12 @@ exports.createBrandValidator = [
     .isLength({ min: 3 })
     .withMessage("Brand title must be at least 3 characters")
     .isLength({ max: 20 })
-    .withMessage("Brand title must not be more than 20 characters"),
+    .withMessage("Brand title must not be more than 20 characters")
+    .custom((val, { req }) => {
+      req.body.slug = slugify(val, { lower: true });
+      return true;
+    }),
+  ,
   validatorMiddleWare,
 ];
 
