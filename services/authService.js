@@ -1,8 +1,12 @@
-const asyncHandler = require("express-async-handler");
+const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
+
 const UserSchema = require("../models/userModel");
 const AppError = require("../utils/AppError");
-const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
+
 exports.signUp = asyncHandler(async (req, res, next) => {
   const { name, slug, email, password, profilePhoto } = req.body;
 
@@ -48,6 +52,9 @@ exports.logIn = asyncHandler(async (req, res, next) => {
     }
   );
   user.password = undefined;
+  user.active = undefined;
+  user.role = undefined;
+
   res.status(201).json({ status: "success", data: user, token });
 });
 
@@ -113,19 +120,99 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
     return next(new AppError(`this Email:${email} didn't exits`, 404));
   }
   const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-  ((checkUserExists.resetCode = resetCode),
-    (checkUserExists.resetCodeExpires = Date.now() + 10 * 60 * 1000)); // بعد 10 دقايق
+  const sha256Hash = crypto
+    .createHash("sha256")
+    .update(resetCode)
+    .digest("hex");
+  checkUserExists.resetCode = sha256Hash;
+
+  checkUserExists.resetCodeExpires = Date.now() + 10 * 60 * 1000;
+  checkUserExists.passwordResetVerified = false;
   await checkUserExists.save();
-  console.log(checkUserExists);
+
+  const message = `Hi ${checkUserExists.name},\n We received a request to reset the password on your E-shop Account. \n ${resetCode} \n Enter this code to complete the reset. \n Thanks for helping us keep your account secure.\n The E-shop Team`;
+
+  try {
+    await sendEmail({
+      email: checkUserExists.email,
+      subject: "Your password reset code (valid for 10 min)",
+      message,
+    });
+  } catch (err) {
+    checkUserExists.resetCode = undefined;
+    checkUserExists.resetCodeExpires = undefined;
+    checkUserExists.passwordResetVerified = undefined;
+    await checkUserExists.save();
+    return next(new AppError("There is an error in sending email", 500));
+  }
+
+  res
+    .status(200)
+    .json({ status: "Success", message: "Reset code sent to email" });
 });
 
 exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
   const code = req.body.code;
+
+  const hashedCode = crypto.createHash("sha256").update(code).digest("hex");
+
   const checkUserExists = await UserSchema.findOne({
-    resetCode: code,
+    resetCode: hashedCode,
+    resetCodeExpires: { $gt: Date.now() },
   });
+
   if (!checkUserExists) {
-    return next(new AppError(`this code:${code} is wrong`, 404));
+    return next(new AppError("Invalid or expired reset code", 400));
   }
-  console.log("updated");
+  checkUserExists.passwordResetVerified = true;
+  await checkUserExists.save();
+  const token = jwt.sign(
+    { userId: checkUserExists.id, email: checkUserExists.email },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: "10m",
+    }
+  );
+  res.status(200).json({ message: "Code verified successfully", token });
+});
+
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const { password } = req.body;
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) {
+    return next(new AppError("please verify your email first", 400));
+  }
+
+  // 2) verify token
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+  const user = await UserSchema.findById(decoded.userId);
+  if (!user || !user.passwordResetVerified) {
+    return next(new AppError("Please verify reset code first", 400));
+  }
+
+  user.password = password;
+  user.resetCode = undefined;
+  user.resetCodeExpires = undefined;
+  user.passwordResetVerified = undefined;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+  const newToken = jwt.sign(
+    { userId: user.id, userName: user.name },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
+  res.status(200).json({
+    message: "user password updated successfully",
+    token: newToken,
+  });
 });

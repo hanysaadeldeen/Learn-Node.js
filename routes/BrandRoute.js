@@ -48,7 +48,7 @@ router
     CreateBrand,
     multerErrorHandler
   )
-  .get(protect, getAllBrands);
+  .get(getAllBrands);
 router
   .route("/:id")
   .get(getSpecificBrandValidator, getSpecificBrand)

@@ -127,3 +127,52 @@ exports.updateUserPasswordValidator = [
 
   validatorMiddleWare,
 ];
+exports.updateMYPasswordValidator = [
+  check("password").notEmpty().withMessage("user password is required"),
+  check("confirmPassword")
+    .notEmpty()
+    .withMessage("user confirmPassword is required")
+    .custom((val, { req }) => {
+      if (val !== req.body.password) {
+        throw new AppError("passwordConfirmation didn't math password", 400);
+      }
+      return true;
+    }),
+  check("currentPassword")
+    .notEmpty()
+    .withMessage("currentPassword is required"),
+  validatorMiddleWare,
+];
+
+exports.updateMyProfValidator = [
+  check("name")
+    .optional()
+    .isString()
+    .withMessage("user name must be letters")
+    .isLength({ min: 2, max: 20 })
+    .withMessage("user name must be at least 2 characters and max is 20"),
+  check("email")
+    .optional()
+    .isEmail()
+    .withMessage("invalid email format")
+    .custom((val) =>
+      UserModel.findOne({ email: val }).then((user) => {
+        if (user) {
+          return Promise.reject(new Error("this user email already exists"));
+        }
+      })
+    ),
+  check("phone")
+    .optional()
+    .isMobilePhone(["ar-EG", "ar-SA"])
+    .withMessage("phone number must be egypt number or saudi number"),
+  check("profilePhoto")
+    .optional()
+    .isString()
+    .withMessage("user profile Photo must be a string (URL or filename)"),
+  check("role")
+    .optional()
+    .isIn(["admin", "user"])
+    .withMessage("role must be either 'admin' or 'user'"),
+  validatorMiddleWare,
+];

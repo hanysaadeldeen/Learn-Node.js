@@ -15,7 +15,7 @@ const globalErrorHandler = (err, req, res, next) => {
   if (err.code === 11000) err = handleDuplicateFieldsDB(err);
 
   if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
-    err.message = "Please log in again!";
+    err.message = "Please login again!";
     // next();
   }
 

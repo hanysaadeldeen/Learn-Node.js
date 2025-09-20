@@ -8,6 +8,11 @@ const {
   unActiveUsers,
   UploadUserImage,
   updateUserPassword,
+  getLoggedUserData,
+  getUser,
+  updateLogedUserPassword,
+  updateLogedUser,
+  deleteLoggedUserData,
 } = require("../services/userService");
 
 const { ProcessImgGlobal } = require("../services/handlersFactory");
@@ -18,49 +23,53 @@ const {
   createUserValidator,
   updateAndUnActiveUserValidator,
   updateUserPasswordValidator,
+  updateMYPasswordValidator,
+  updateMyProfValidator,
 } = require("../utils/Validator/userValidator");
 
 const router = express.Router();
+
+const { protect, allowedTo } = require("../services/authService");
+
+//! for Users
+router.use(protect);
+
+router.get("/getMe", getLoggedUserData, getUser);
+router.put(
+  "/updateMyPassword",
+  updateMYPasswordValidator,
+  updateLogedUserPassword
+);
+router.put("/updateMe", updateMyProfValidator, updateLogedUser);
+router.delete("/deleteMe", deleteLoggedUserData);
+
+//! for Admin
+
+router.use(allowedTo(["admin", "manager"]));
 
 router.put(
   "/updatePassword/:id",
   updateUserPasswordValidator,
   updateUserPassword
 );
-const { protect, allowedTo } = require("../services/authService");
-
 router
   .route("/")
   .post(
-    protect,
-    allowedTo(["admin", "manager"]),
     UploadUserImage,
     ProcessImgGlobal("users"),
     createUserValidator,
     CreateUsers,
     multerErrorHandler
   )
-  .get(protect, allowedTo(["admin", "manager"]), getAllUserss);
+  .get(getAllUserss);
 router
   .route("/:id")
-  .get(
-    protect,
-    allowedTo(["admin", "manager"]),
-    updateAndUnActiveUserValidator,
-    getSpecificUsers
-  )
+  .get(updateAndUnActiveUserValidator, getSpecificUsers)
   .put(
-    protect,
-    allowedTo(["admin", "manager"]),
     UploadUserImage,
     ProcessImgGlobal("users"),
     updateAndUnActiveUserValidator,
     updateUser
   )
-  .delete(
-    protect,
-    allowedTo(["admin", "manager"]),
-    updateAndUnActiveUserValidator,
-    unActiveUsers
-  );
+  .delete(updateAndUnActiveUserValidator, unActiveUsers);
 module.exports = router;

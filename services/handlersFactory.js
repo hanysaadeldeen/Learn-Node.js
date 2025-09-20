@@ -148,6 +148,10 @@ exports.GetSpecificDoc = (model, options = {}) => {
       response.password = undefined;
     }
 
+    if (response.active || response.role) {
+      response.active = undefined;
+      response.role = undefined;
+    }
     res.status(200).json({ status: "success", data: response });
   });
 };

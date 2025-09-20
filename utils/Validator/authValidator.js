@@ -81,7 +81,26 @@ exports.verifyPasswordValidator = [
   check("code")
     .notEmpty()
     .withMessage("code is required")
-    .isLength(6)
-    .withMessage("code length is 6 digits"),
+    .isLength({ min: 6, max: 6 })
+    .withMessage("code length must be 6 digits")
+    .isNumeric()
+    .withMessage("code must be numeric"),
+  validatorMiddleWare,
+];
+exports.resetPasswordValidator = [
+  check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6 })
+    .withMessage("password length must be at least 6 character"),
+  check("passwordConfirm")
+    .notEmpty()
+    .withMessage("passwordConfirm is required")
+    .custom((val, { req }) => {
+      if (val !== req.body.password) {
+        throw new AppError("passwordConfirm didn't math password", 400);
+      }
+      return true;
+    }),
   validatorMiddleWare,
 ];
