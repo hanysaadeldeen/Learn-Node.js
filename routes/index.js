@@ -8,6 +8,7 @@ const ProductRoute = require("./ProductRoute");
 const BrandRoute = require("./BrandRoute");
 const UserRoute = require("./UserRoute");
 const AuthRoute = require("./AuthRoute");
+const ReviewRoute = require("./ReviewRoute");
 
 // mount routes
 router.use("/categories", categoryRoute);
@@ -16,5 +17,6 @@ router.use("/brands", BrandRoute);
 router.use("/products", ProductRoute);
 router.use("/users", UserRoute);
 router.use("/auth", AuthRoute);
+router.use("/review", ReviewRoute);
 
 module.exports = router;
