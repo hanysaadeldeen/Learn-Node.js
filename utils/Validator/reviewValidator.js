@@ -33,7 +33,7 @@ exports.createReviewValidator = [
   validatorMiddleWare,
 ];
 
-exports.updateReview = [
+exports.updateReviewValidator = [
   check("reviewId")
     .notEmpty()
     .withMessage("reviewId is required")
@@ -62,7 +62,7 @@ exports.updateReview = [
   validatorMiddleWare,
 ];
 
-exports.deleteReview = [
+exports.deleteReviewValidator = [
   check("reviewId")
     .notEmpty()
     .withMessage("reviewId is required")
