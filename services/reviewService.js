@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const ReviewModel = require("../models/reviewModel");
 const AppError = require("../utils/AppError");
+const { GetDocs } = require("./handlersFactory");
 
 exports.CreateReview = asyncHandler(async (req, res, next) => {
   const productId = req.params.id;
@@ -20,14 +21,15 @@ exports.CreateReview = asyncHandler(async (req, res, next) => {
   res.status(201).json({ message: "review created", data: review });
 });
 
-exports.GetReviewsOnProduct = asyncHandler(async (req, res, next) => {
-  const productId = req.params.id;
-  const reviews = await ReviewModel.find({ product: productId }).populate(
-    "user"
-  );
-  if (!reviews) {
-    return next(new AppError("Can not get ProductReview rightNow", 404));
-  }
+exports.GetReviewsOnProduct = GetDocs(ReviewModel);
+// exports.GetReviewsOnProduct = asyncHandler(async (req, res, next) => {
+//   const productId = req.params.id;
+//   const reviews = await ReviewModel.find({ product: productId }).populate(
+//     "user"
+//   );
+//   if (!reviews) {
+//     return next(new AppError("Can not get ProductReview rightNow", 404));
+//   }
 
-  res.status(201).json({ message: "success", data: reviews });
-});
+//   res.status(201).json({ message: "success", data: reviews });
+// });
