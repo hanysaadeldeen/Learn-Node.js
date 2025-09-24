@@ -19,5 +19,10 @@ router
   .get(GetReviewsOnProduct)
   .post(allowedTo(["user"]), createReviewValidator, CreateReview)
   .put(allowedTo(["user"]), updateReviewValidator, updateReveiw);
-router.delete("/", allowedTo(["user"]), deleteReviewValidator, deleteReveiw);
+router.delete(
+  "/",
+  allowedTo(["user", "manager"]),
+  deleteReviewValidator,
+  deleteReveiw
+);
 module.exports = router;
