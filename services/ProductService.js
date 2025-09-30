@@ -21,7 +21,9 @@ exports.getAllProducts = GetDocs(ProductModel);
 // @get  Specific Product
 // @route  get /api/product/:id
 // @access public
-exports.getProduct = GetSpecificDoc(ProductModel);
+exports.getProduct = GetSpecificDoc(ProductModel, {
+  populate: { path: "ProductReview" },
+});
 
 //@update product by id
 //@route put /api/product/:id

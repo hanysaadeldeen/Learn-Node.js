@@ -32,6 +32,36 @@ exports.createReviewValidator = [
 
   validatorMiddleWare,
 ];
+exports.createReviewValidatorNested = [
+  check("comment")
+    .notEmpty()
+    .withMessage("comment is required")
+    .isString()
+    .withMessage("user name must be letters"),
+  check("rating")
+    .notEmpty()
+    .withMessage("rating is required")
+    .isFloat({ min: 1, max: 5 })
+    .withMessage("rating must be between 1 and 5"),
+  param("productId")
+    .notEmpty()
+    .withMessage("productId is required")
+    .custom(async (val, { req }) => {
+      if (req.user.role !== "user") {
+        throw new AppError("admin can't delete review", 400);
+      }
+      const isUserAddReview = await ReviewModel.findOne({
+        user: req.user._id,
+        product: val,
+      });
+      if (isUserAddReview) {
+        throw new AppError("user created review before", 400);
+      }
+      return true;
+    }),
+
+  validatorMiddleWare,
+];
 
 exports.updateReviewValidator = [
   check("reviewId")

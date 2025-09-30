@@ -3,6 +3,14 @@ const ReviewModel = require("../models/reviewModel");
 const AppError = require("../utils/AppError");
 const { GetDocs } = require("./handlersFactory");
 
+// nested route
+exports.createFilterObj = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.productId) filterObject = { product: req.params.productId };
+  req.filterObj = filterObject;
+  next();
+};
+
 exports.CreateReview = asyncHandler(async (req, res, next) => {
   const productId = req.params.id;
   const { comment, rating } = req.body;
@@ -20,9 +28,37 @@ exports.CreateReview = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({ message: "review created", data: review });
 });
+exports.CreateReviewNested = asyncHandler(async (req, res, next) => {
+  const { productId } = req.params;
+  const { comment, rating } = req.body;
+  const { _id: userId } = req.user;
 
-exports.GetReviewsOnProduct = GetDocs(ReviewModel);
+  const review = await ReviewModel.create({
+    comment,
+    rating,
+    user: userId,
+    product: productId,
+  });
 
+  if (!review) {
+    return next(new AppError("Can not Create ProductReview rightNow", 404));
+  }
+
+  res.status(201).json({ message: "review created", data: review });
+});
+
+exports.GetReviewsOnProductNested = GetDocs(ReviewModel);
+exports.GetReviewsOnProduct = asyncHandler(async (req, res, next) => {
+  const review = await ReviewModel.find({
+    product: req.params.id,
+  });
+
+  if (!review) {
+    return next(new AppError("cant't find this id", 404));
+  }
+
+  res.status(200).json({ message: "success", data: review });
+});
 exports.updateReveiw = asyncHandler(async (req, res, next) => {
   const { comment, rating, reviewId } = req.body;
   const review = await ReviewModel.findByIdAndUpdate(

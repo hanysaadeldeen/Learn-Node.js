@@ -78,6 +78,8 @@ const ProductSchema = mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
@@ -89,6 +91,12 @@ function SaveImage(doc) {
     });
   }
 }
+
+ProductSchema.virtual("ProductReview", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "product",
+});
 
 ProductSchema.post("init", function (doc) {
   SaveImage(doc);

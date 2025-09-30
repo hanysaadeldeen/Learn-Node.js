@@ -9,6 +9,7 @@ const {
   GetDocs,
 } = require("./handlersFactory");
 
+// Nested route
 exports.setCategoryIdtoBody = (req, res, next) => {
   if (req.params.categoryId) req.body.category = req.params.categoryId;
   next();

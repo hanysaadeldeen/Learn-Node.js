@@ -120,14 +120,13 @@ exports.GetSpecificDoc = (model, options = {}) => {
     let response;
 
     if (options.field) {
-      response = await model.find({ [options.field]: id });
+      let query = model.find({ [options.field]: id });
 
       if (options.populate) {
-        response = await model
-          .find({ [options.field]: id })
-          .populate(options.populate);
+        query = query.populate(options.populate);
       }
 
+      response = await query;
       if (!response || response.length === 0) {
         return next(
           new AppError(`no documents found with ${options.field} = ${id}`, 404)
@@ -138,7 +137,16 @@ exports.GetSpecificDoc = (model, options = {}) => {
     }
 
     // get by id
-    response = await model.findById(id);
+
+    // response = await model.findById(id).populate("ProductReview");
+
+    let query = model.findById(id);
+
+    if (options.populate) {
+      query = query.populate(options.populate);
+    }
+
+    response = await query;
 
     if (!response) {
       return next(new AppError(`no document found with id = ${id}`, 404));

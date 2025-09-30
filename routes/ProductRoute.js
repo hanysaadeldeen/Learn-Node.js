@@ -19,9 +19,11 @@ const {
   ProcessingImgesFiles,
   UploadImagesfileds,
 } = require("../services/handlersFactory");
+const ReviewRoute = require("./ReviewRoute");
 
 const router = express.Router({ mergeParams: true });
 
+router.use("/:productId/review", ReviewRoute);
 router
   .route("/")
   .post(
