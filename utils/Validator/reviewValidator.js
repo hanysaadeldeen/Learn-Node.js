@@ -54,9 +54,9 @@ exports.createReviewValidatorNested = [
         user: req.user._id,
         product: val,
       });
-      if (isUserAddReview) {
-        throw new AppError("user created review before", 400);
-      }
+      // if (isUserAddReview) {
+      //   throw new AppError("user created review before", 400);
+      // }
       return true;
     }),
 
