@@ -74,6 +74,9 @@ exports.updateReveiw = asyncHandler(async (req, res, next) => {
     return next(new AppError("Can not update ProductReview rightNow", 404));
   }
 
+  // Trigger "save" or "countAverageOnProduct" event when update document
+  // await ReviewModel.countAverageOnProduct(review.product);
+  review.save();
   res.status(201).json({ message: "review updated", data: review });
 });
 
@@ -81,6 +84,17 @@ exports.deleteReveiw = asyncHandler(async (req, res, next) => {
   const { reviewId } = req.body;
 
   const reviews = await ReviewModel.findByIdAndDelete(reviewId);
+  if (!reviews) {
+    return next(new AppError("Can not get delete Review rightNow", 404));
+  }
+
+  res.status(201).json({ message: "deleted Success" });
+});
+
+exports.deleteReveiwNested = asyncHandler(async (req, res, next) => {
+  const { reveiwId } = req.params;
+
+  const reviews = await ReviewModel.findByIdAndDelete(reveiwId);
   if (!reviews) {
     return next(new AppError("Can not get delete Review rightNow", 404));
   }

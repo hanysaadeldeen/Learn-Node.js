@@ -62,6 +62,9 @@ ReviewSchema.statics.countAverageOnProduct = async function (productId) {
 ReviewSchema.post("save", async function () {
   await this.constructor.countAverageOnProduct(this.product);
 });
+ReviewSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) await doc.constructor.countAverageOnProduct(doc.product);
+});
 
 const ReviewModel = mongoose.model("Review", ReviewSchema);
 

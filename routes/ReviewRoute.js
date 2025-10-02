@@ -6,6 +6,7 @@ const {
   GetReviewsOnProductNested,
   updateReveiw,
   deleteReveiw,
+  deleteReveiwNested,
   createFilterObj,
 } = require("../services/reviewService");
 const { protect, allowedTo } = require("../services/authService");
@@ -24,6 +25,8 @@ router
   .route("/")
   .get(createFilterObj, GetReviewsOnProductNested)
   .post(allowedTo(["user"]), createReviewValidatorNested, CreateReviewNested);
+
+router.delete("/:reveiwId", allowedTo(["user", "manager"]), deleteReveiwNested);
 
 // for regular route
 router
