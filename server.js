@@ -1,10 +1,10 @@
-const dotenv = require("dotenv");
+// !const dotenv = require("dotenv");
 
-dotenv.config({ path: ".env" });
+// !dotenv.config({ path: ".env" });
 
-const dbConnection = require("./config/database");
-const app = require("./app");
-// handle undefined routes (should come before error handler)
+// !const dbConnection = require("./config/database");
+//! const app = require("./app");
+// !handle undefined routes (should come before error handler)
 
 // app.all("*", (req, res) => {
 //   res.status(404).json({
@@ -14,20 +14,39 @@ const app = require("./app");
 // });
 
 // Connect with db
-dbConnection();
+// !dbConnection();
 
 // listen to your project
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+//! const PORT = process.env.PORT || 5000;
+// const server = app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
 
-process.on("unhandledRejection", (err) => {
-  // error outside express
-  console.error(`"Unhandled Rejection at: ${err.name} || ${err.message}"`);
-  // close server before exit
-  server.close(() => {
-    console.log("shutting down...");
-    process.exit(1);
+// !process.on("unhandledRejection", (err) => {
+//   // error outside express
+//   console.error(`"Unhandled Rejection at: ${err.name} || ${err.message}"`);
+//   // close server before exit
+//   server.close(() => {
+//     console.log("shutting down...");
+//     process.exit(1);
+//   });
+// });
+
+const dotenv = require("dotenv");
+dotenv.config({ path: ".env" });
+
+const dbConnection = require("./config/database");
+const app = require("./app");
+
+// Connect with db
+dbConnection();
+
+// لو بتشغل محلي شغّل السيرفر
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running locally on port ${PORT}`);
   });
-});
+}
+
+module.exports = app;
