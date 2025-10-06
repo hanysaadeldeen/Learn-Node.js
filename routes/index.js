@@ -12,6 +12,7 @@ const ReviewRoute = require("./ReviewRoute");
 const wishLishRoute = require("./wishLishRoute");
 const addressRoute = require("./addressRoute");
 const couponRoute = require("./couponRoute");
+const cartRoute = require("./cartRoute");
 
 // mount routes
 router.use("/categories", categoryRoute);
@@ -24,5 +25,6 @@ router.use("/review", ReviewRoute);
 router.use("/wishlish", wishLishRoute);
 router.use("/address", addressRoute);
 router.use("/coupons", couponRoute);
+router.use("/cart", cartRoute);
 
 module.exports = router;
