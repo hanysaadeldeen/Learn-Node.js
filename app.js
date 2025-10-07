@@ -33,6 +33,9 @@ app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   }
   res.send({ errors: result.mapped() });
 });
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Welcome to My Project" });
+});
 
 app.use(globalError);
 
