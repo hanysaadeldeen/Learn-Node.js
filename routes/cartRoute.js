@@ -7,6 +7,7 @@ const {
   getLogedUserCart,
   deleteSpecificCartItems,
   clearLoggedUser,
+  updateCartItemQuantity,
 } = require("../services/cartService");
 
 router.use(protect, allowedTo(["user"]));
@@ -14,6 +15,10 @@ router.use(protect, allowedTo(["user"]));
 router.route("/:productId").post(addProductToCart);
 
 router.delete("/item", deleteSpecificCartItems);
-router.route("/").get(getLogedUserCart).delete(clearLoggedUser);
+router
+  .route("/")
+  .get(getLogedUserCart)
+  .delete(clearLoggedUser)
+  .put(updateCartItemQuantity);
 
 module.exports = router;

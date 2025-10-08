@@ -74,10 +74,12 @@ exports.getLogedUserCart = asynchandler(async (req, res, next) => {
       numOfCartItems: 0,
     });
   }
+  cart.totalCartPrice = calcTotalCartPrice(cart);
+  await cart.save();
   res.status(200).json({
     data: "success",
     numOfCartItems: cart.cartItems.length,
-    cartItems: cart.cartItems,
+    cart: cart,
   });
 });
 
@@ -112,5 +114,44 @@ exports.clearLoggedUser = asynchandler(async (req, res, next) => {
 
   res.status(201).json({
     message: "Cart Deleted Successfully",
+  });
+});
+
+// @desc    Update specific cart item quantity
+// @route   PUT /api/v1/cart/
+// @access  Private/User
+exports.updateCartItemQuantity = asynchandler(async (req, res, next) => {
+  const { quantity, itemId } = req.body;
+  // const cart = await CartModel.findOne({ user: req.user._id });
+
+  // if (!cart) {
+  //   return next(new Error("Cart not found"));
+  // }
+  // const itemIndex = cart.cartItems.findIndex(
+  //   (item) => item._id.toString() === itemId
+  // );
+
+  // if (itemIndex > -1) {
+  //   cart.cartItems[itemIndex].quantity = quantity;
+  // } else {
+  //   return next(new AppError("Item not found in cart", 404));
+  // }
+
+  // await cart.save();
+
+  const cart = await CartModel.findOneAndUpdate(
+    { user: req.user._id, "cartItems._id": itemId },
+    { $set: { "cartItems.$.quantity": quantity } },
+    { new: true }
+  );
+  if (!cart) {
+    return next(new AppError("Item not found in cart", 404));
+  }
+  cart.totalCartPrice = calcTotalCartPrice(cart);
+
+  res.status(200).json({
+    status: "success",
+    message: "Cart item quantity updated successfully",
+    cart,
   });
 });
