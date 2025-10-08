@@ -5,11 +5,15 @@ const { protect, allowedTo } = require("../services/authService");
 const {
   addProductToCart,
   getLogedUserCart,
+  deleteSpecificCartItems,
+  clearLoggedUser,
 } = require("../services/cartService");
 
 router.use(protect, allowedTo(["user"]));
 
 router.route("/:productId").post(addProductToCart);
-router.route("/").get(getLogedUserCart);
+
+router.delete("/item", deleteSpecificCartItems);
+router.route("/").get(getLogedUserCart).delete(clearLoggedUser);
 
 module.exports = router;

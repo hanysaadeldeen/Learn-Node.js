@@ -76,7 +76,41 @@ exports.getLogedUserCart = asynchandler(async (req, res, next) => {
   }
   res.status(200).json({
     data: "success",
-    cartItems: cart.cartItems,
     numOfCartItems: cart.cartItems.length,
+    cartItems: cart.cartItems,
+  });
+});
+
+// @desc    Remove specific cart item
+// @route   DELETE /api/v1/cart/
+// @access  Private/User
+exports.deleteSpecificCartItems = asynchandler(async (req, res, next) => {
+  const cart = await CartModel.findOneAndUpdate(
+    { user: req.user._id },
+    {
+      $pull: { cartItems: { _id: req.body.itemId } },
+    },
+    { new: true }
+  );
+
+  cart.totalCartPrice = calcTotalCartPrice(cart);
+
+  cart.save();
+
+  res.status(201).json({
+    message: "product Deleted Successfuly",
+    numOfCartItems: cart.cartItems.length,
+    cart: cart,
+  });
+});
+
+// @desc    clear logged user cart
+// @route   DELETE /api/v1/cart
+// @access  Private/User
+exports.clearLoggedUser = asynchandler(async (req, res, next) => {
+  await CartModel.findOneAndDelete({ user: req.user._id });
+
+  res.status(201).json({
+    message: "Cart Deleted Successfully",
   });
 });
