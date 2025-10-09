@@ -3,6 +3,8 @@ const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const qs = require("qs");
+const cors = require("cors");
+
 const { query, validationResult } = require("express-validator");
 const routes = require("./routes/index");
 
@@ -10,6 +12,7 @@ const { globalError } = require("./middlewares/errorMiddleWare");
 const globalErrorHandler = require("./services/errorController");
 const app = express();
 
+app.use(cors());
 // middleWares
 app.use(express.json());
 // for static image
