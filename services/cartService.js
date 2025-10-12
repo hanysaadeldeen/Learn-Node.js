@@ -1,5 +1,6 @@
 const asynchandler = require("express-async-handler");
 const CartModel = require("../models/cartModel");
+const CouponModel = require("../models/couponModel");
 const ProductModel = require("../models/ProductModel");
 const AppError = require("../utils/AppError");
 
@@ -8,7 +9,7 @@ const calcTotalCartPrice = (cart) => {
   cart.cartItems.forEach((product) => {
     totalPrice += product.price * product.quantity;
   });
-  cart.totalPriceAfterDiscount = undefined;
+  cart.totalPriceAfterDiscount = 0;
   return totalPrice;
 };
 
@@ -152,6 +153,46 @@ exports.updateCartItemQuantity = asynchandler(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Cart item quantity updated successfully",
+    cart,
+  });
+});
+
+// @desc    Apply coupon on logged user cart
+// @route   PUT /api/v1/cart/coupon
+// @access  Private/User
+exports.applyCoupon = asynchandler(async (req, res, next) => {
+  const { coupon } = req.body;
+  const cart = await CartModel.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(new AppError("Cart not found", 404));
+  }
+
+  const totalPrice = calcTotalCartPrice(cart);
+  // apply coupon
+  const couponDiscount = await CouponModel.findOne({
+    name: coupon,
+    expire: { $gt: Date.now() },
+  });
+
+  if (!couponDiscount) {
+    return next(new AppError("Coupon is invalid or expired", 404));
+  }
+
+  const discountPrice = (totalPrice * couponDiscount.discount) / 100;
+  cart.totalPriceAfterDiscount = Number(totalPrice - discountPrice).toFixed(2);
+  cart.appliedCoupon = couponDiscount.name;
+  cart.discount = couponDiscount.discount;
+  await cart.save();
+
+  cart.appliedCoupon = undefined;
+  cart.discount = undefined;
+  res.status(200).json({
+    status: "success",
+    message: "Coupon applied successfully",
+    totalPriceBeforeDiscount: totalPrice,
+    discountPercentage: couponDiscount.discount,
+    totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
+    numOfCartItems: cart.cartItems.length,
     cart,
   });
 });

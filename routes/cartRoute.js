@@ -8,11 +8,13 @@ const {
   deleteSpecificCartItems,
   clearLoggedUser,
   updateCartItemQuantity,
+  applyCoupon,
 } = require("../services/cartService");
 
 router.use(protect, allowedTo(["user"]));
 
 router.route("/:productId").post(addProductToCart);
+router.route("/coupon").put(applyCoupon);
 
 router.delete("/item", deleteSpecificCartItems);
 router

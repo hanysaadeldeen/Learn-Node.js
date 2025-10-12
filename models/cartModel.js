@@ -1,4 +1,3 @@
-const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema(
@@ -34,6 +33,8 @@ const cartSchema = new mongoose.Schema(
     totalPriceAfterDiscount: {
       type: Number,
     },
+    appliedCoupon: String,
+    discount: String,
   },
   {
     timestamps: true,
