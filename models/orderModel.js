@@ -29,6 +29,10 @@ const orderSchema = new mongoose.Schema(
     totalPriceAfterDiscount: {
       type: Number,
     },
+    totalPrice: {
+      type: Number,
+      required: true,
+    },
     paymentMethodType: {
       type: String,
       enum: ["VisaCard", "cash"],

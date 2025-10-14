@@ -9,7 +9,11 @@ const calcTotalCartPrice = (cart) => {
   cart.cartItems.forEach((product) => {
     totalPrice += product.price * product.quantity;
   });
+
   cart.totalPriceAfterDiscount = 0;
+  cart.appliedCoupon = undefined;
+  cart.discount = undefined;
+
   return totalPrice;
 };
 
@@ -67,6 +71,7 @@ exports.addProductToCart = asynchandler(async (req, res, next) => {
 
 exports.getLogedUserCart = asynchandler(async (req, res, next) => {
   const cart = await CartModel.findOne({ user: req.user._id });
+
   if (!cart || cart.cartItems.length === 0) {
     return res.status(200).json({
       status: "success",
@@ -75,8 +80,9 @@ exports.getLogedUserCart = asynchandler(async (req, res, next) => {
       numOfCartItems: 0,
     });
   }
-  cart.totalCartPrice = calcTotalCartPrice(cart);
-  await cart.save();
+
+  // cart.totalCartPrice = calcTotalCartPrice(cart);
+  // await cart.save();
   res.status(200).json({
     data: "success",
     numOfCartItems: cart.cartItems.length,
@@ -189,9 +195,7 @@ exports.applyCoupon = asynchandler(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Coupon applied successfully",
-    totalPriceBeforeDiscount: totalPrice,
     discountPercentage: couponDiscount.discount,
-    totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
     numOfCartItems: cart.cartItems.length,
     cart,
   });

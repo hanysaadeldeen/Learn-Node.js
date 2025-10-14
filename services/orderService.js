@@ -15,11 +15,24 @@ exports.createCashOrder = asynchandler(async (req, res, next) => {
   }
 
   // 2) Create order with default paymentMethodType cash
+
+  let totlaPriceWithTaxAndShipping = 0;
+  if (cart.totalPriceAfterDiscount) {
+    totlaPriceWithTaxAndShipping =
+      cart.totalPriceAfterDiscount + taxPrice + shippingPrice;
+  } else {
+    totlaPriceWithTaxAndShipping =
+      cart.totalCartPrice + taxPrice + shippingPrice;
+  }
+
   const order = await OrderModel.create({
     user: userId,
     cartItems: cart.cartItems,
     totalOrderPrice: cart.totalCartPrice,
-    totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
+    totalPriceAfterDiscount: cart.totalPriceAfterDiscount
+      ? cart.totalPriceAfterDiscount
+      : undefined,
+    totalPrice: totlaPriceWithTaxAndShipping,
     paymentMethodType,
     shippingPrice: shippingPrice || 0,
     taxPrice: taxPrice || 0,
