@@ -14,6 +14,7 @@ const app = express();
 
 app.use(cors());
 // middleWares
+app.use(express.json({ limit: "50kb" })); // body limit is 10
 app.use(express.json());
 // for static image
 
