@@ -1,35 +1,46 @@
 const path = require("path");
-
 const express = require("express");
 const morgan = require("morgan");
 const qs = require("qs");
 const cors = require("cors");
-
+const rateLimit = require("express-rate-limit");
 const { query, validationResult } = require("express-validator");
-const routes = require("./routes/index");
 
+const routes = require("./routes/index");
 const { globalError } = require("./middlewares/errorMiddleWare");
 const globalErrorHandler = require("./services/errorController");
+
 const app = express();
 
+// Enable CORS
 app.use(cors());
-// middleWares
-app.use(express.json({ limit: "50kb" })); // body limit is 10
-app.use(express.json());
-// for static image
 
+// Parse JSON with limit
+app.use(express.json({ limit: "50kb" }));
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100,
+  message: { error: "Too many requests, please try again later." },
+});
+app.use("/api", limiter);
+
+// Static Files
 app.use(express.static(path.join(__dirname, "uploads")));
 
+// Custom Query Parser
 app.set("query parser", (str) => qs.parse(str));
+
+// Logger (only in dev mode)
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// routes
+// Main Routes
 app.use("/api/v1", routes);
 
-app.use(globalErrorHandler);
-
+// Example route with validation
 app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   const result = validationResult(req);
   if (result.isEmpty()) {
@@ -37,10 +48,14 @@ app.get("/hello", query("person").notEmpty().escape(), (req, res) => {
   }
   res.send({ errors: result.mapped() });
 });
+
+// Base Route
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to My Project" });
 });
 
+// Global Error Handlers
+app.use(globalErrorHandler);
 app.use(globalError);
 
 module.exports = app;
