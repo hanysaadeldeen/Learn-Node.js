@@ -3,7 +3,9 @@ const express = require("express");
 const morgan = require("morgan");
 const qs = require("qs");
 const cors = require("cors");
+// Security Packages
 const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
 const { query, validationResult } = require("express-validator");
 
 const routes = require("./routes/index");
@@ -31,7 +33,7 @@ app.use(express.static(path.join(__dirname, "uploads")));
 
 // Custom Query Parser
 app.set("query parser", (str) => qs.parse(str));
-
+app.use(hpp());
 // Logger (only in dev mode)
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
