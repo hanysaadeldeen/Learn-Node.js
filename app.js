@@ -6,6 +6,8 @@ const cors = require("cors");
 // Security Packages
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
+const mongoSanitize = require("express-mongo-sanitize");
+const { xss } = require("express-xss-sanitizer");
 const { query, validationResult } = require("express-validator");
 
 const routes = require("./routes/index");
@@ -16,9 +18,17 @@ const app = express();
 
 // Enable CORS
 app.use(cors());
-
 // Parse JSON with limit
 app.use(express.json({ limit: "50kb" }));
+// !Data Sanitization against NoSQL Injection
+// app.use(
+//   mongoSanitize({
+//     allowDots: true,
+//     replaceWith: "_",
+//   })
+// );
+
+// app.use(xss());
 
 // Rate Limiting
 const limiter = rateLimit({

@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const UserSchema = require("../models/userModel");
 const AppError = require("../utils/AppError");
 const sendEmail = require("../utils/sendEmail");
+const { sanitizeUser } = require("../utils/sanitizeUser");
 
 exports.signUp = asyncHandler(async (req, res, next) => {
   const { name, slug, email, password, profilePhoto } = req.body;
@@ -55,7 +56,7 @@ exports.logIn = asyncHandler(async (req, res, next) => {
   user.active = undefined;
   user.role = undefined;
 
-  res.status(201).json({ status: "success", data: user, token });
+  res.status(201).json({ status: "success", data: sanitizeUser(user), token });
 });
 
 exports.protect = asyncHandler(async (req, res, next) => {
